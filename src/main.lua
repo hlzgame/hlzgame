@@ -6,6 +6,9 @@ require "config"
 require "cocos.init"
 require "GameLogic.Game"
 
+require("Framework.ResManager.ResManager")
+
+
 --[[
     这里需要遵循一个规则 
     调用的方法，必须在当前方法的上面
@@ -48,12 +51,14 @@ local function main()
 
     --在main函数里面，可以初始化一些单例
     --g_EventDispatch = EventDispatch:getInstance()
-
+    g_ResManager = ResManager:getInstance()
 
     --[[
     collectgarbage (opt [, arg])
 　　功能：是垃圾收集器的通用接口，用于操作垃圾收集器
     ]]
+
+
 
     collectgarbage("collect");
     -- avoid memory leak

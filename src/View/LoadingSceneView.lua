@@ -40,6 +40,11 @@ function LoadingSceneView:createScene()
 	label:setPosition(cc.p(1136/2,500))
 	layer:addChild(label,2)
 
+
+	self.guiNode = createGUINode(res.RES_START_GAME)
+	self:addChild(self.guiNode,10)
+
+
 end
 
 function LoadingSceneView:onEnter()
