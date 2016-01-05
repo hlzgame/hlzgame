@@ -11,7 +11,7 @@
 ]]
 
 require("Utils.EventNode")
-require("View.LoadingSceneView")
+require("View.SceneView.LoadingSceneView")
 
 Game = class("Game")
 Game.__index = Game
