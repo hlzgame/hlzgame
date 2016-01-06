@@ -24,12 +24,12 @@ function createGUINode(file)
     --logDebug(file) --打印资源名字，以后方便查看
 
     local node 
-    --local fileExtName = getExtension(file);
-	--if fileExtName == "csb" then   --csb格式
-	--    node = ccs.GUIReader:getInstance():widgetFromBinaryFile(file);
-	--else                           --json格式
+    local fileExtName = getExtension(file);
+	if fileExtName == "csb" then   --csb格式
+	    node = ccs.GUIReader:getInstance():widgetFromBinaryFile(file);
+	else                           --json格式
 	    node = ccs.GUIReader:getInstance():widgetFromJsonFile(file);
-	--end
+	end
 
 	return node 
 

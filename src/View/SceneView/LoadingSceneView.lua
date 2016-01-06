@@ -2,8 +2,11 @@
 -- Author: HLZ
 -- Date: 2015-12-29 14:56:16
 -- 预加载场景
+--[[
+    对所需要的资源进行统一化的加载
+    切换场景 不对必要的资源进行释放
+]]
 
-require("View.SceneView.StartSceneView")
 
 LoadingSceneView = class("LoadingSceneView",function()
 	return cc.Scene:create()
@@ -23,7 +26,6 @@ function LoadingSceneView:initScene()
     end
 end
 
-
 function LoadingSceneView:createScene()
 
 	self:initScene()
@@ -33,13 +35,12 @@ function LoadingSceneView:createScene()
 
 	-- self.guiNode = createGUINode(res.RES_START_GAME)
 	-- self.layer:addChild(self.guiNode,10)
-    StartSceneView.open()
+    g_game:enterStartScene()
 
 end
 
 function LoadingSceneView:onEnter()
     print("createScene") 
-	--self:createScene()
 end
 
 function LoadingSceneView:onExit()

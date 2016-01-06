@@ -12,6 +12,7 @@
 
 require("Utils.EventNode")
 require("View.SceneView.LoadingSceneView")
+require("View.SceneView.StartSceneView")
 
 Game = class("Game")
 Game.__index = Game
@@ -45,6 +46,7 @@ function Game:enterLoadingScene()
     LoadingSceneView.open()
 end
 
-function Game:enterMainScene()
+function Game:enterStartScene()
+    StartSceneView.open()
 end
 
