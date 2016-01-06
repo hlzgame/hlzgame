@@ -2,12 +2,9 @@
 -- Author: HLZ
 -- Date: 2015-12-29 14:56:16
 -- 开始菜单场景
-require("Utils.EventScene")
 
 StartSceneView = class("StartSceneView",EventScene)
---[[
-    继承与 EventScene类，所以ctor onEnter onExit 都需要super
---]]
+
 
 function StartSceneView:ctor()
 	StartSceneView.super.ctor(self)
@@ -48,9 +45,6 @@ function StartSceneView:createScene()
 		   g_EventDispatch:dispatchEvent(TEST_EVENT_RETURN)
 	    end 
 	end)
-
-	--logDebug("---")
-
 
 end
 

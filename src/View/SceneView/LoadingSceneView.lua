@@ -7,14 +7,10 @@
     切换场景 不对必要的资源进行释放
 ]]
 
-
-LoadingSceneView = class("LoadingSceneView",function()
-	return cc.Scene:create()
-end)
-
-
+LoadingSceneView = class("LoadingSceneView",EventScene)
 
 function LoadingSceneView:ctor()
+	LoadingSceneView.super.ctor(self)
 	
 end
 
@@ -40,11 +36,13 @@ function LoadingSceneView:createScene()
 end
 
 function LoadingSceneView:onEnter()
-    print("createScene") 
+	LoadingSceneView.super.ctor(self)
+    print("LoadingSceneView onEnter") 
 end
 
 function LoadingSceneView:onExit()
-
+	LoadingSceneView.super.ctor(self)
+	print("LoadingSceneView onExit") 
 end
 
 function LoadingSceneView.open()

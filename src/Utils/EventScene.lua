@@ -8,13 +8,15 @@ EventScene = class("EventScene", function (  )
 end)
 EventScene.__index = EventScene
 
+--[[
+    继承于 EventScene的类，需要在ctor() onEnter() onExit() 加上 .super.ctor(self)类似的方法 
+--]]
 
 function EventScene:ctor()
 	
 	--当前场景监听的事件数组
 	self.eventListeners = {}
-    
-
+   
     --进入时，调用onEnter() 
     --退出时，调用onExit()
 	self:registerScriptHandler(function ( event )
@@ -27,25 +29,27 @@ function EventScene:ctor()
 
 	self:setName(self.__cname)
 	--poi?
-	self.hasPoped = false
+	--self.hasPoped = false
 end
 
 function EventScene:dispatchEvent(event,data)
-	g_EventDispatch:dispatchEvent(event,data);
+	g_EventDispatch:dispatchEvent(event,data)
 end
 
 function EventScene:registerEvent( event,callBack,groupID,priority )
-	self.eventListeners = self.eventListeners or {};
-	self.eventListeners[#self.eventListeners + 1] = g_EventDispatch:registerEvent(event,callBack,groupID,priority);
+	--将事件加入数组，方便在退出的时候将侦听事件给移除掉
+	self.eventListeners = self.eventListeners or {}
+	self.eventListeners[#self.eventListeners + 1] = g_EventDispatch:registerEvent(event,callBack,groupID,priority)
 	return self.eventListeners[#self.eventListeners + 1]
 end
 
 function EventScene:onExit( )
 	if self.eventListeners == nil then
-		return ;
+		return 
 	end
+	--统一对事件数组里面的时间进行释放
 	for i,v in ipairs(self.eventListeners) do
-		g_EventDispatch:removeEvent(v);
+		g_EventDispatch:removeEvent(v)
 	end
 	--self:_removeTimer();
 	
