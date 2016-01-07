@@ -76,6 +76,23 @@ function TiledMapScene:getLayer(layerName)
     return self.tiledMap:getLayer(layerName)
 end
 
+
+  --转tilemap地图      从世界地图坐标转到TiledMap地图坐标
+function TiledMapScene:tileCoordForPosition(tileMap,position) 
+	local x = math.floor(position.x / tileMap:getTileSize().width)
+	local y = math.floor(((tileMap:getMapSize().height * tileMap:getTileSize().height)-position.y) / tileMap:getTileSize().height)
+	return cc.p(x,y)
+end
+
+  --转正常地图         从TiledMap地图坐标转到世界地图坐标
+function TiledMapScene:positionForTileCoord(tileMap,tileCoord)
+	local x = math.floor((tileCoord.x * tileMap:getTileSize().width) + tileMap:getTileSize().width / 2)
+	local y = math.floor((tileMap:getMapSize().height * tileMap:getTileSize().height) -
+		(tileCoord.y * tileMap:getTileSize().height) - tileMap:getTileSize().height / 2)
+	return cc.p(x, y)
+end
+
+
 --[[
 
     用的到的一些TiledMap地图的方法 
@@ -85,20 +102,7 @@ end
     移除一个地图块：    layer:removeTileAt(cc.p(x,y))
     获得当前地图的每块地图的长宽  getMapSize().height   getMapSize().width
     
-      --转tilemap地图
-	function TileMap:tileCoordForPosition(position) 
-		local x = math.floor(position.x / self._tileMap:getTileSize().width)
-		local y = math.floor(((self._tileMap:getMapSize().height * self._tileMap:getTileSize().height)-position.y) / self._tileMap:getTileSize().height)
-		return cc.p(x,y)
-	end
 
-	  --转正常地图
-	function TileMap:positionForTileCoord(tileCoord)
-		local x = math.floor((tileCoord.x * self._tileMap:getTileSize().width) + self._tileMap:getTileSize().width / 2)
-		local y = math.floor((self._tileMap:getMapSize().height * self._tileMap:getTileSize().height) -
-			(tileCoord.y * self._tileMap:getTileSize().height) - self._tileMap:getTileSize().height / 2)
-		return cc.p(x, y);
-	end
 
 --]]
 

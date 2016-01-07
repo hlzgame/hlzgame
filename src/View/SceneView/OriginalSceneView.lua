@@ -10,6 +10,8 @@
      还可以扩展  更多的功能性
 --]]
 
+require("View.Hero.PlayerView")
+
 OriginalSceneView = class("OriginalSceneView",TiledMapScene)
 
 
@@ -49,6 +51,14 @@ function OriginalSceneView:initTileMap()
     self.impactLayer = self:getLayer(IMPACT_LAYER)
     self.impactLayer:setVisible(false)
 
+    local pos = self:tileCoordForPosition(self.map,cc.p(0,1))
+    dump(pos)
+
+    local player = PlayerView.new()
+
+    self.map:addChild(player)
+
+    player:setPosition(self:positionForTileCoord(self.map,cc.p(1,28)))
 end
 
 function OriginalSceneView:onEnter()
