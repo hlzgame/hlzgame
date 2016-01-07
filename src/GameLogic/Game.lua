@@ -11,8 +11,11 @@
 ]]
 require("Utils.EventScene")
 require("Utils.EventNode")
+require("Utils.TiledMapScene")
+
 require("View.SceneView.LoadingSceneView")
 require("View.SceneView.StartSceneView")
+require("View.SceneView.OriginalSceneView")
 
 Game = class("Game")
 Game.__index = Game
@@ -48,5 +51,13 @@ end
 
 function Game:enterStartScene()
     StartSceneView.open()
+end
+
+function Game:enterOriginalScene()
+    OriginalSceneView.open()
+end
+
+function Game:enterBattleScene()
+
 end
 

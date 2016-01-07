@@ -24,6 +24,7 @@ end
 function StartSceneView:initEvent()
     self:registerEvent(TEST_EVENT_RETURN,function(event)
         print("TEST_EVENT_RETURN")
+
    end)
 end
 
@@ -42,7 +43,8 @@ function StartSceneView:createScene()
 	self.btnStart:addTouchEventListener(function(sender,event)
 		if event == ccui.TouchEventType.ended then 
 		   print("self.btnStart")
-		   g_EventDispatch:dispatchEvent(TEST_EVENT_RETURN)
+		   g_game:enterOriginalScene()
+		   --g_EventDispatch:dispatchEvent(TEST_EVENT_RETURN)
 	    end 
 	end)
 

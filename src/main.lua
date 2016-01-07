@@ -14,6 +14,7 @@ LuaFileList = {
   "Utils.Log",
   "Utils.Queue",
   "Utils.EventID",
+  "Utils.TiledMapID"
 }
 
 for i,v in ipairs(LuaFileList) do

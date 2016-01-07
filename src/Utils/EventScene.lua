@@ -63,6 +63,12 @@ function EventScene:onHide(  )
 	
 end
 
+-- function EventScene:createTMXTM(file)
+-- 	return cc.TMXTiledMap:create(file)
+-- end
+
+
+
 -- --开启时间计时？
 -- function EventNode:_startTimer( func,dt )
 -- 	self:_removeTimer();
