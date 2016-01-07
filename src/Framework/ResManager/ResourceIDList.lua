@@ -10,3 +10,6 @@ lib = lib or {}
 
 --开始游戏UI 
 res.RES_START_GAME = "publish/UiStartGame_1.json"
+
+--背景UI
+res.RES_BACKGROUND_ORIGINAL = "publish/UiBackground_1.json"

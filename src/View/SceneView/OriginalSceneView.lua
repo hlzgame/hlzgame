@@ -36,9 +36,16 @@ end
 function OriginalSceneView:initTileMap()
 	--加载地图
 	self.map = self:createTMXTM(ORIGINAL_SCENCE_TMX)
-    self:addChild(self.map)
-    self.map:setAnchorPoint(cc.p(0.5,0.5))
-    self.map:setPosition(cc.p(1136/2+500,320))
+    self:addChild(self.map,5)
+    self.map:setAnchorPoint(cc.p(0,0))
+    self.map:setPosition(cc.p(0,0))
+
+    --加载背景图片
+
+    self.guiNode = createGUINode(res.RES_BACKGROUND_ORIGINAL)
+    self:addChild(self.guiNode)
+
+
 end
 
 function OriginalSceneView:onEnter()
