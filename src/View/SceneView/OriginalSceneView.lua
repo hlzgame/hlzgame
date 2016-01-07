@@ -44,7 +44,10 @@ function OriginalSceneView:initTileMap()
 
     self.guiNode = createGUINode(res.RES_BACKGROUND_ORIGINAL)
     self:addChild(self.guiNode)
+    
 
+    self.impactLayer = self:getLayer(IMPACT_LAYER)
+    self.impactLayer:setVisible(false)
 
 end
 

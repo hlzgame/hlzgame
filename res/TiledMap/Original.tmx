@@ -8,12 +8,12 @@
  </tileset>
  <layer name="Map" width="100" height="30">
   <data encoding="base64" compression="zlib">
-   eJztmkEKgDAMBPv/Z3j0leJBpEpbTUxdyAwED3raITRG11LKSkkVaIAPLfChBT60wIcW+NACH1rgQwt8aIEPLfChRYSPpVEwxuvjTe4tTzg7sfqIyi+7F4uPGZlldWL1MYOMTvChBT608PiYMRtlc/JlfzyZZy3zcSY88+5x9fTIyEc2vO8f18zeesFHTeS+ZHS/91xGFztR+8Re74yyznhuHETud5+c3eyxambv28m9D98/tMCHFn//N0zdawPOYOin
+   eJzt2rENg0AQBdHrv5OjCtyB3QHuwO7Al5uVvrxInmCetFoEl00AAdsYY3NQIwZ7sNiDxR4s9mCxB4s9WOzBYg8We7DYg8UeLPZgsQeLPVjswWIPFnuw2IPlrMcszs6TZ9VZ/SbtMYNr9dmDxR4sVY/qXVHds8s10u+rfc0t2OpJe9zXPIKtnrTHseYZbPWkPV5r3sFWz7//G3a+5wMjRdut
   </data>
  </layer>
  <layer name="Impact" width="100" height="30" opacity="0.39">
   <data encoding="base64" compression="zlib">
-   eJztmdEKgCAMRfX/fzp6CKoHzc2NSzsH9mQK7mDN1VtrnZAK0AAfWuBDC3xogQ8t8KEFPrTAhxb40AIfWuBDiwgf9GTseHO1knf6aHOseYjKX3Uvlv1n5KyqE6uPDCo6wYcW+NDC4yOjNqrmZOf52P2vuGKt5al37/O966yO/RXv/eM9d3U9fDyJ7JfMxkfPVXRxknnP/vpeq/jduIiujWZngT7Wk+z9k/cx5EULfGhhvcMRcXEA5JcBZA==
+   eJzt2rENACAQA7Fn/6UZgIYKrrClTHBt1swsS40GPVr0aNGjRY8WPVr0aNGjRY8WPVr0aNGjRY8WPVr0aNGjRY8WPVr0aNGjRY8WPVr0aNGj5baHH9cberTo0aJHy+/fsJ3bdJgBKQ==
   </data>
  </layer>
 </map>
