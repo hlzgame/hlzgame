@@ -14,7 +14,8 @@ LuaFileList = {
   "Utils.Log",
   "Utils.Queue",
   "Utils.EventID",
-  "Utils.TiledMapID"
+  "Utils.TiledMapID",
+  "Utils.GameUtil",
 }
 
 for i,v in ipairs(LuaFileList) do
@@ -61,16 +62,17 @@ local function main()
 
     --在main函数里面，可以初始化一些单例
     --g_EventDispatch = EventDispatch:getInstance()
-    g_game = Game:getInstance()
-    g_ResManager = ResManager:getInstance()
-    g_EventDispatch = EventDispatch:getInstance()
+    g_game            = Game:getInstance()
+    g_ResManager      = ResManager:getInstance()
+    g_EventDispatch   = EventDispatch:getInstance()
+    g_scheduler       = cc.Director:getInstance():getScheduler()
+
+
+
     --[[
     collectgarbage (opt [, arg])
 　　功能：是垃圾收集器的通用接口，用于操作垃圾收集器
     ]]
-
-
-
     collectgarbage("collect");
     -- avoid memory leak
     collectgarbage("setpause", 100);

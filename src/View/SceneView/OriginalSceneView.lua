@@ -27,6 +27,7 @@ function OriginalSceneView:initScene()
     end
     self:initEvent()
     self:initTileMap()
+    self:setCameraMask(2)
 end
 
 function OriginalSceneView:initEvent()
@@ -51,26 +52,37 @@ function OriginalSceneView:initTileMap()
     self.impactLayer = self:getLayer(IMPACT_LAYER)
     self.impactLayer:setVisible(false)
 
-    local pos = self:tileCoordForPosition(self.map,cc.p(0,1))
-    dump(pos)
-
     local player = PlayerView.new()
 
-    self.map:addChild(player)
+    self.map:addChild(player,10)
 
     player:setPosition(self:positionForTileCoord(self.map,cc.p(1,28)))
+
+    if self.updateBattle ~= nil  then
+        g_scheduler:unscheduleScriptEntry(self.updateBattle);
+        self.updateBattle = nil 
+    end
+
+    local func = function ()
+        player:setPositionX(player:getPositionX() + 0.5)
+        player:setPositionY(player:getPositionY() + 0.1)
+    end
+
+    self.updateBattle = g_scheduler:scheduleScriptFunc(func, 0, false);
+
+
 end
 
 function OriginalSceneView:onEnter()
 	OriginalSceneView.super.onEnter(self)
-    print("onEnter")
+    print("OriginalSceneView onEnter")
 
     --self:initScene()
 end
 
 function OriginalSceneView:onExit()
 	OriginalSceneView.super.onExit(self)
-    print("onExit")
+    print("OriginalSceneView onExit")
 end
 
 function OriginalSceneView.open()

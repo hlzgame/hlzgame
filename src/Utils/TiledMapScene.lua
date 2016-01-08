@@ -28,7 +28,7 @@ function TiledMapScene:ctor()
 			self:onExit()
 		end
 	end)
-
+    
 	self:setName(self.__cname)
 	--poi?
 	--self.hasPoped = false

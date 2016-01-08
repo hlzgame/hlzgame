@@ -9,9 +9,11 @@
     游戏的主城场景
     游戏的各类分支场景的管理
 ]]
-require("Utils.EventScene")
+
 require("Utils.EventNode")
+require("Utils.PlayerNode")
 require("Utils.TiledMapScene")
+require("Utils.EventScene")
 
 require("View.SceneView.LoadingSceneView")
 require("View.SceneView.StartSceneView")

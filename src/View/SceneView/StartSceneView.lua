@@ -52,12 +52,12 @@ end
 
 function StartSceneView:onEnter()
 	StartSceneView.super.onEnter(self)
-    print("onEnter")
+    print("StartSceneView onEnter")
 end
 
 function StartSceneView:onExit()
 	StartSceneView.super.onExit(self)
-    print("onExit")
+    print("StartSceneView onExit")
 end
 
 function StartSceneView.open()
