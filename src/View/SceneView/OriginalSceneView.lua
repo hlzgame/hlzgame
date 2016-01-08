@@ -14,7 +14,6 @@ require("View.Hero.PlayerView")
 
 OriginalSceneView = class("OriginalSceneView",TiledMapScene)
 
-
 function OriginalSceneView:ctor()
 	OriginalSceneView.super.ctor(self)
 end
@@ -27,7 +26,7 @@ function OriginalSceneView:initScene()
     end
     self:initEvent()
     self:initTileMap()
-    self:setCameraMask(2)
+
 end
 
 function OriginalSceneView:initEvent()
@@ -52,27 +51,65 @@ function OriginalSceneView:initTileMap()
     self.impactLayer = self:getLayer(IMPACT_LAYER)
     self.impactLayer:setVisible(false)
 
-    local player = PlayerView.new()
+    self.player = PlayerView.new()
 
-    self.map:addChild(player,10)
+    self.map:addChild(self.player,10)
 
-    player:setPosition(self:positionForTileCoord(self.map,cc.p(1,28)))
+
+
+    self.initPlayerPos = self:positionForTileCoord(self.map,cc.p(12,28))
+
+    self.player:setPosition(self.initPlayerPos)
 
     if self.updateBattle ~= nil  then
         g_scheduler:unscheduleScriptEntry(self.updateBattle);
         self.updateBattle = nil 
     end
 
+    self.camera = self:setCamera(self)
+
     local func = function ()
-        player:setPositionX(player:getPositionX() + 0.5)
-        player:setPositionY(player:getPositionY() + 0.1)
+
+        self.speed = 0.1
+        self.player:setPositionX(self.player:getPositionX() + self.speed*5)
+        self.player:setPositionY(self.player:getPositionY() + self.speed)
+
+
+        self:refreshPlayerAndCamera()
+        
     end
-
+    
     self.updateBattle = g_scheduler:scheduleScriptFunc(func, 0, false);
-
-
+    
+    
 end
 
+function OriginalSceneView:refreshPlayerAndCamera()
+    local distanceX = math.abs(self.camera:getPositionX() - self.player:getPositionX()) 
+    local distanceY = math.abs(self.camera:getPositionY() - self.player:getPositionY())
+
+    if distanceX > GameUtil:VISIBLE_WIDTH()/4 then 
+       --需要判断方向
+       if self.player:getPositionX() < self.camera:getPositionX() then  --在左边
+       	  self:setCameraPosX(-1,self.speed*5)
+       else                                                             --在右边
+       	  self:setCameraPosX(1,self.speed*5)
+       end
+       
+    end
+
+    if distanceY > GameUtil:VISIBLE_HEIGHT()/4 then 
+       --需要判断方向
+       if self.player:getPositionY() < self.camera:getPositionY() then  --在下边
+       	  self:setCameraPosY(-1,self.speed)
+       else                                                             --在上边
+       	  self:setCameraPosY(1,self.speed)
+       end
+    end
+
+    -- dump(distanceX) 
+    -- dump(distanceY) 
+end
 function OriginalSceneView:onEnter()
 	OriginalSceneView.super.onEnter(self)
     print("OriginalSceneView onEnter")

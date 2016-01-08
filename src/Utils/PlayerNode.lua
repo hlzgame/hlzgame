@@ -47,7 +47,7 @@ function PlayerNode:ctor()
 	--相机
 	self.camera = nil 
     
-    
+    self:setCameraMask(2)
 
 	self:setName(self.__cname)
 
@@ -56,45 +56,6 @@ end
 function PlayerNode:dispatchEvent(event,data)
 	g_EventDispatch:dispatchEvent(event,data)
 end
-
-function PlayerNode:setCamera(node)
-	--创建唯一相机
-	self.node = node 
-	if self.camera == nil then
-        self.camera = cc.Camera:createPerspective(60, 1136 / 640, 1, 1000)
-        self.camera:setCameraFlag(cc.CameraFlag.USER1)
-        self.node:addChild(self.camera)
-        --self.camera:setPosition3D(cc.vec3(0, 0, 10))
-        local pos3D = self.node:getPosition3D()
-
-        --self.camera:setPosition3D(cc.vec3(0 + pos3D.x, 130 + pos3D.y, 130 + pos3D.z))
-        self.camera:setPosition3D(cc.vec3(0, 0, 500))
-        self.camera:lookAt(cc.vec3(0,0,-1), cc.vec3(0,1,0))
-
-        dump(self.camera:getPosition3D())
-    end
-    self.node:setCameraMask(2)
-
-    -- if self.updateHandler ~= nil then 
-    -- 	g_scheduler:unscheduleScriptEntry(self.updateHandler)
-    -- 	self.updateHandler = nil 
-    -- end
-
-    -- self.updateHandler = g_scheduler:scheduleScriptFunc(self:update(),0, false);
-
-    return self.camera
-
-end
-
--- function PlayerNode:update()
---     if self.isPause == true then
---         return nil
---     end
-  
---     self.camera:setPositionX(self.node:getPositionX() - 180)
---     self.camera:setPositionY(self.node:getPositionY() - 180)
-
--- end
 
 
 function PlayerNode:registerEvent( event,callBack,groupID,priority )

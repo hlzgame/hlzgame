@@ -29,7 +29,7 @@ function PlayerView:ctor()
 end
 
 function PlayerView:initPlayer()
-	self.camera = self:setCamera(self)
+	
 end
 
 function PlayerView:getTiledMapScene(scene)

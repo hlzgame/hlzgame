@@ -69,6 +69,10 @@ function TiledMapScene:createTMXTM(file)
 	if self.tiledMap == nil then 
 	   self.tiledMap = cc.TMXTiledMap:create(file)
     end
+
+    self.maxWidth = self.tiledMap:getContentSize().width - GameUtil:VISIBLE_WIDTH()/2
+    self.maxHeight = self.tiledMap:getContentSize().height - GameUtil:VISIBLE_HEIGHT()/2
+
     return self.tiledMap
 end
 
@@ -93,6 +97,54 @@ function TiledMapScene:positionForTileCoord(tileMap,tileCoord)
 end
 
 
+--[[
+    参数:
+	[1] fieldOfView 相机视野 0~p (即 0~180 度) 之间
+	[2] aspectRatio 屏幕的高宽比
+	[3] nearPlane 第三个参数是与近平面的距离,请注意距离比与近平面还近的内容都不会呈现在游戏窗口中
+	[4] farPlane 第四个参数是与远平面的距离，请注意距离比与远平面还远的内容都不会呈现在游戏窗口中。
+--]]
+
+function TiledMapScene:setCamera(scene)
+	--创建唯一相机
+	if self.camera == nil then
+
+        self.camera = cc.Camera:createPerspective(60, GameUtil:VISIBLE_WIDTH() / GameUtil:VISIBLE_HEIGHT(), 1, 1000)
+        self.camera:setCameraFlag(cc.CameraFlag.USER1)
+        scene:addChild(self.camera)
+        --self.camera:setPosition3D(cc.vec3(0, 0, 10))
+        local pos3D = scene:getPosition3D()
+        dump(pos3D)
+        --self.camera:setPosition3D(cc.vec3(0 + pos3D.x, 130 + pos3D.y, 130 + pos3D.z))
+        self.camera:setPosition3D(cc.vec3(0, 0, 550))
+        self.camera:lookAt(cc.vec3(0,0,0), cc.vec3(0,1,0))
+        self.camera:setPosition(cc.p(GameUtil:VISIBLE_WIDTH()/2,GameUtil:VISIBLE_HEIGHT()/2))
+
+        dump(self.camera:getPosition())
+    end
+    scene:setCameraMask(2)
+
+    return self.camera
+
+end
+
+function TiledMapScene:setCameraPosX(direction,x)
+	local distanceX = direction * x
+	local nowPosX = self.camera:getPositionX() + distanceX
+	if ((nowPosX < GameUtil:VISIBLE_WIDTH()/2) and direction == -1 ) or ((nowPosX > self.maxWidth) and direction == 1 ) then 
+		return 
+	end
+	self.camera:setPositionX(nowPosX)
+end
+
+function TiledMapScene:setCameraPosY(direction,y)
+	local distanceY = direction * y
+	local nowPosY = self.camera:getPositionY() + distanceY
+	if ((nowPosY < GameUtil:VISIBLE_HEIGHT()/2) and direction == -1 ) or ((nowPosY > self.maxHeight) and direction == 1 ) then 
+		return 
+	end
+    self.camera:setPositionY(nowPosY)
+end
 --[[
 
     用的到的一些TiledMap地图的方法 
