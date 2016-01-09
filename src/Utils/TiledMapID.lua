@@ -11,3 +11,4 @@ ORIGINAL_SCENCE_TMX = "TiledMap/Original.tmx"
 
 
 IMPACT_LAYER = "Impact"
+BACKGROUND_LAYER = "BackGroud"

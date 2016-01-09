@@ -36,26 +36,34 @@ function OriginalSceneView:initEvent()
 end
 
 function OriginalSceneView:initTileMap()
-	--加载地图
-	self.map = self:createTMXTM(ORIGINAL_SCENCE_TMX)
-    self:addChild(self.map,5)
-    self.map:setAnchorPoint(cc.p(0,0))
-    self.map:setPosition(cc.p(0,0))
 
     --加载背景图片
-
-    self.guiNode = createGUINode(res.RES_BACKGROUND_ORIGINAL)
+    self.guiNode = cc.Sprite:create("publish/resource/bg.png")--createGUINode(res.RES_BACKGROUND_ORIGINAL)
+    self.guiNode:setName("self.guiNode")
+    --self.guiNode:setCameraMask(cc.CameraFlag.USER1)
     self:addChild(self.guiNode)
-    
+    --self.guiNode:setVisible(false)
+    --dump(cc.Camera:getDefaultCamera():getPosition())
 
+
+    --加载地图
+	self.map = self:createTMXTM(ORIGINAL_SCENCE_TMX)
+	self.map:setName("self.map")
+    self:addChild(self.map,5)
+    self.map:setAnchorPoint(cc.p(0,0))    
+    self.map:setCameraMask(cc.CameraFlag.USER1)
+    --self.map:setPosition(cc.p(0,0))
+
+       
     self.impactLayer = self:getLayer(IMPACT_LAYER)
+    --self.backGroundLayer = self:getLayer(BACKGROUND_LAYER)
     self.impactLayer:setVisible(false)
 
     self.player = PlayerView.new()
-
+    --self.player:setCameraMask(cc.CameraFlag.USER1)
     self.map:addChild(self.player,10)
 
-
+   
 
     self.initPlayerPos = self:positionForTileCoord(self.map,cc.p(12,28))
 
@@ -71,16 +79,20 @@ function OriginalSceneView:initTileMap()
     local func = function ()
 
         self.speed = 0.1
-        self.player:setPositionX(self.player:getPositionX() + self.speed*5)
-        self.player:setPositionY(self.player:getPositionY() + self.speed)
+        self.player:setPositionX(self.player:getPositionX() + self.speed*10)
+        self.player:setPositionY(self.player:getPositionY() + self.speed*10)
 
 
         self:refreshPlayerAndCamera()
         
     end
+
     
-    self.updateBattle = g_scheduler:scheduleScriptFunc(func, 0, false);
+    --self.updateBattle = g_scheduler:scheduleScriptFunc(func, 0, false);
     
+    --开启触摸
+    self:initTouchListener()
+
     
 end
 
@@ -91,9 +103,9 @@ function OriginalSceneView:refreshPlayerAndCamera()
     if distanceX > GameUtil:VISIBLE_WIDTH()/4 then 
        --需要判断方向
        if self.player:getPositionX() < self.camera:getPositionX() then  --在左边
-       	  self:setCameraPosX(-1,self.speed*5)
+       	  self:setCameraPosX(-1,self.speed*10)
        else                                                             --在右边
-       	  self:setCameraPosX(1,self.speed*5)
+       	  self:setCameraPosX(1,self.speed*10)
        end
        
     end
@@ -101,15 +113,40 @@ function OriginalSceneView:refreshPlayerAndCamera()
     if distanceY > GameUtil:VISIBLE_HEIGHT()/4 then 
        --需要判断方向
        if self.player:getPositionY() < self.camera:getPositionY() then  --在下边
-       	  self:setCameraPosY(-1,self.speed)
+       	  self:setCameraPosY(-1,self.speed*10)
        else                                                             --在上边
-       	  self:setCameraPosY(1,self.speed)
+       	  self:setCameraPosY(1,self.speed*10)
        end
     end
 
     -- dump(distanceX) 
     -- dump(distanceY) 
 end
+
+
+function OriginalSceneView:onTouchBegan( x,y )
+	print("-----onTouchBegan-------")
+    print(x,y)
+    dump(self.map:convertToNodeSpace(cc.p(x,y)))
+    dump(self.map:convertToNodeSpaceAR(cc.p(x,y)))
+    dump(self.map:convertToWorldSpaceAR(cc.p(x,y)))
+    dump(self.map:convertToWorldSpace(cc.p(x,y)))
+ 
+end
+
+function OriginalSceneView:onTouchMoved( x,y )
+	print("-----onTouchMoved-------")
+    print(x,y)
+    dump(self.map:convertToNodeSpace(cc.p(x,y)))
+end
+
+function OriginalSceneView:onTouchEnded( x,y,exJudge )
+    print("-----onTouchEnded-------")
+    print(x,y)
+    dump(self.map:convertToNodeSpace(cc.p(x,y)))
+end
+
+
 function OriginalSceneView:onEnter()
 	OriginalSceneView.super.onEnter(self)
     print("OriginalSceneView onEnter")
