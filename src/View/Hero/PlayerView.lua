@@ -15,6 +15,7 @@ function PlayerView:ctor()
 
 	local sprite = cc.Sprite:create("publish/resource/player.png")
 	self:addChild(sprite)
+	sprite:setAnchorPoint(cc.p(0.5,0.5))
 	sprite:setPositionY(32)
 
 	--设置节点

@@ -116,28 +116,53 @@ end
 	    从最底层 到 最上层 需要的相机分别是：
             不动的背景层     需要移动的TiledMap层   不需要移动的UI层
 	          camera2             camera1             defaultcamera
+	    cc.CameraFlag.USER2  cc.CameraFlag.USER1      cameraFlag = 1
 
 	    =-= 如果不需要背景的话 则只需要创建一个新相机 就可以了； 如果需求是这样的话，就要创建两个新相机了；
 --]]
 
-function TiledMapScene:setCamera(node)
-	--创建唯一相机
-	if self.camera == nil then
+function TiledMapScene:setBackgroundCamera(node)
+	--创建背景相机
+	if self.backgroundCamera == nil then
 
-        self.camera = cc.Camera:createPerspective(60, GameUtil:VISIBLE_WIDTH() / GameUtil:VISIBLE_HEIGHT(), 1, 1000)
-        self.camera:setCameraFlag(cc.CameraFlag.USER1)
-        node:addChild(self.camera)
-        --self.camera:setPosition3D(cc.vec3(0, 0, 10))
+        self.backgroundCamera = cc.Camera:createPerspective(60, GameUtil:VISIBLE_WIDTH() / GameUtil:VISIBLE_HEIGHT(), 1, 1000)
+        self.backgroundCamera:setCameraFlag(cc.CameraFlag.USER2)
+        node:addChild(self.backgroundCamera)
+
         local pos3D = node:getPosition3D()
-        --dump(pos3D)
-        --self.camera:setPosition3D(cc.vec3(0 + pos3D.x, 130 + pos3D.y, 130 + pos3D.z))
-        self.camera:setPosition3D(cc.vec3(0, 0, 550))
-        --self.camera:setPosition3D(cc.Camera:getDefaultCamera():getPosition3D())
-        self.camera:lookAt(cc.vec3(0,0,0), cc.vec3(0,1,0))
-        self.camera:setPosition(cc.p(GameUtil:VISIBLE_WIDTH()/2,GameUtil:VISIBLE_HEIGHT()/2))
+
+        self.backgroundCamera:setPosition3D(cc.vec3(0, 0, 550))
+
+        self.backgroundCamera:lookAt(cc.vec3(0,0,0), cc.vec3(0,1,0))
+        self.backgroundCamera:setPosition(cc.p(GameUtil:VISIBLE_WIDTH()/2,GameUtil:VISIBLE_HEIGHT()/2))
+
+        node:setCameraMask(cc.CameraFlag.USER2)
     end
     
-    return self.camera
+    return self.backgroundCamera
+
+end
+
+function TiledMapScene:setMapCamera(node)
+	--创建地图相机
+	if self.mapCamera == nil then
+
+        self.mapCamera = cc.Camera:createPerspective(60, GameUtil:VISIBLE_WIDTH() / GameUtil:VISIBLE_HEIGHT(), 1, 1000)
+        self.mapCamera:setCameraFlag(cc.CameraFlag.USER1)
+
+        node:addChild(self.mapCamera)
+
+        local pos3D = node:getPosition3D()
+
+        self.mapCamera:setPosition3D(cc.vec3(0, 0, 550))
+
+        self.mapCamera:lookAt(cc.vec3(0,0,0), cc.vec3(0,1,0))
+        self.mapCamera:setPosition(cc.p(GameUtil:VISIBLE_WIDTH()/2,GameUtil:VISIBLE_HEIGHT()/2))
+
+        node:setCameraMask(cc.CameraFlag.USER1)
+    end
+    
+    return self.mapCamera
 
 end
 
@@ -145,61 +170,140 @@ end
 
 function TiledMapScene:setCameraPosX(direction,x)
 	local distanceX = direction * x
-	local nowPosX = self.camera:getPositionX() + distanceX
+	local nowPosX = self.mapCamera:getPositionX() + distanceX
 	if ((nowPosX < GameUtil:VISIBLE_WIDTH()/2) and direction == -1 ) or ((nowPosX > self.maxWidth) and direction == 1 ) then 
 		return 
 	end
-	self.camera:setPositionX(nowPosX)
+	self.mapCamera:setPositionX(nowPosX)
 end
 
 function TiledMapScene:setCameraPosY(direction,y)
 	local distanceY = direction * y
-	local nowPosY = self.camera:getPositionY() + distanceY
+	local nowPosY = self.mapCamera:getPositionY() + distanceY
 	if ((nowPosY < GameUtil:VISIBLE_HEIGHT()/2) and direction == -1 ) or ((nowPosY > self.maxHeight) and direction == 1 ) then 
 		return 
 	end
-    self.camera:setPositionY(nowPosY)
+    self.mapCamera:setPositionY(nowPosY)
 end
 
 
 function TiledMapScene:initTouchListener( bSwallow )
-	if bSwallow == nil then
-		bSwallow = false
-	end
-	local function TouchBegan( touch,event )
-		local location = touch:getLocation()
-		return self:onTouchBegan(location.x,location.y)
-	end
-	local function TouchMoved( touch,event )
-		local location = touch:getLocation()
-		self:onTouchMoved(location.x,location.y)
-	end
-	local function TouchEnded( touch,event )
-		local location = touch:getLocation()
-		self:onTouchEnded(location.x,location.y)
-	end
-	local function TouchCancelled( touch,event )
-		local location = touch:getLocation()
-		self:onTouchCancelled(location.x,location.y)
-	end
-	local listener = cc.EventListenerTouchOneByOne:create()
-    listener:registerScriptHandler(TouchBegan,cc.Handler.EVENT_TOUCH_BEGAN )
-    listener:registerScriptHandler(TouchMoved,cc.Handler.EVENT_TOUCH_MOVED )
-    listener:registerScriptHandler(TouchEnded,cc.Handler.EVENT_TOUCH_ENDED )
-    listener:registerScriptHandler(TouchCancelled,cc.Handler.EVENT_TOUCH_CANCELLED )
-    listener:setSwallowTouches(bSwallow)
-    local eventDispatcher = self:getEventDispatcher()
-    eventDispatcher:addEventListenerWithSceneGraphPriority(listener, self)
-    self._listener = listener
-
+	-- if bSwallow == nil then
+	-- 	bSwallow = false
+	-- end
+	-- local function TouchBegan( touch,event )
+	-- 	local location = touch:getLocation()
+	-- 	return self:onTouchBegan(location.x,location.y)
+	-- end
+	-- local function TouchMoved( touch,event )
+	-- 	local location = touch:getLocation()
+	-- 	self:onTouchMoved(location.x,location.y)
+	-- end
+	-- local function TouchEnded( touch,event )
+	-- 	local location = touch:getLocation()
+	-- 	self:onTouchEnded(location.x,location.y)
+	-- end
+	-- local function TouchCancelled( touch,event )
+	-- 	local location = touch:getLocation()
+	-- 	self:onTouchCancelled(location.x,location.y)
+	-- end
+	-- local listener = cc.EventListenerTouchOneByOne:create()
+ --    listener:registerScriptHandler(TouchBegan,cc.Handler.EVENT_TOUCH_BEGAN )
+ --    listener:registerScriptHandler(TouchMoved,cc.Handler.EVENT_TOUCH_MOVED )
+ --    listener:registerScriptHandler(TouchEnded,cc.Handler.EVENT_TOUCH_ENDED )
+ --    listener:registerScriptHandler(TouchCancelled,cc.Handler.EVENT_TOUCH_CANCELLED )
+ --    listener:setSwallowTouches(bSwallow)
+ --    local eventDispatcher = self:getEventDispatcher()
+ --    eventDispatcher:addEventListenerWithSceneGraphPriority(listener, self)
+ --    self._listener = listener
 
 end
+
+function TiledMapScene:initKeyBoardListener()
+        --按下事件
+	    local function keyboardPressed(keyCode, event)
+	        if keyCode == cc.KeyCode.KEY_LEFT_ARROW then
+	            self:pressedLeftBtnListener()
+	        elseif keyCode == cc.KeyCode.KEY_RIGHT_ARROW then
+	            self:pressedRightBtnListener()
+	        elseif keyCode == cc.KeyCode.KEY_UP_ARROW then
+	            self:pressedUpBtnListener()
+	        elseif keyCode == cc.KeyCode.KEY_DOWN_ARROW then
+	            self:pressedDownBtnListener()
+	        end
+	        -- print("keyCode = "..tostring(keyCode))
+	        -- print("event = "..tostring(event))
+        end
+        
+        --松开事件
+        local function keyboardReleased(keyCode, event)
+	        if keyCode == cc.KeyCode.KEY_LEFT_ARROW then
+	            self:releasedLeftBtnListener()
+	        elseif keyCode == cc.KeyCode.KEY_RIGHT_ARROW then
+	            self:releasedRightBtnListener()
+	        elseif keyCode == cc.KeyCode.KEY_UP_ARROW then
+	            self:releasedUpBtnListener()
+	        elseif keyCode == cc.KeyCode.KEY_DOWN_ARROW then
+	            self:releasedDownBtnListener()
+	        end
+
+	        -- print("keyCode = "..tostring(keyCode))
+	        -- print("event = "..tostring(event))
+        end
+
+    local listener = cc.EventListenerKeyboard:create()
+    listener:registerScriptHandler(keyboardPressed, cc.Handler.EVENT_KEYBOARD_PRESSED)
+    listener:registerScriptHandler(keyboardReleased,cc.Handler.EVENT_KEYBOARD_RELEASED)
+    
+
+    local eventDispatcher = self:getEventDispatcher()
+    eventDispatcher:addEventListenerWithSceneGraphPriority(listener,self)
+    self._listener = listener
+
+end
+
 function TiledMapScene:removeTouchListener(  )
 	if self._listener then 
 		local eventDispatcher = self:getEventDispatcher()
 		eventDispatcher:removeEventListener(self._listener)
 		self._listener = nil
     end
+end
+
+--按下事件
+function TiledMapScene:pressedLeftBtnListener()
+
+end
+
+function TiledMapScene:pressedRightBtnListener()
+
+end
+
+function TiledMapScene:pressedUpBtnListener()
+
+end
+
+function TiledMapScene:pressedDownBtnListener()
+
+end
+
+
+
+--松开事件
+function TiledMapScene:releasedLeftBtnListener()
+
+end
+
+function TiledMapScene:releasedRightBtnListener()
+
+end
+
+function TiledMapScene:releasedUpBtnListener()
+
+end
+
+function TiledMapScene:releasedDownBtnListener()
+
 end
 
 --[[
