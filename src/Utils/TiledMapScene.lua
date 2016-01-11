@@ -167,6 +167,38 @@ function TiledMapScene:setMapCamera(node)
 end
 
 
+--这里还有问题 =。= 计算出错
+function TiledMapScene:refreshPlayerAndCamera(speed,player)
+
+	local mapCameraPosX = self.mapCamera:getPositionX()
+	local mapCameraPosY = self.mapCamera:getPositionY()
+    local distanceX = mapCameraPosX - player:getPositionX()
+    local distanceY = mapCameraPosY - player:getPositionY()
+
+    if math.abs(distanceX) > GameUtil:VISIBLE_WIDTH()/4 and distanceX > 0 then 
+       --需要判断方向
+       if player:getPositionX() < mapCameraPosX then  --在左边
+       	  self:setCameraPosX(-1,math.abs(speed))
+       end
+    elseif math.abs(distanceX) > GameUtil:VISIBLE_WIDTH()/4 and distanceX < 0 then
+        if player:getPositionX() >= mapCameraPosX then  --在右边                                                               
+          self:setCameraPosX(1,math.abs(speed))
+        end
+    end
+
+    if math.abs(distanceY) > GameUtil:VISIBLE_HEIGHT()/4 and distanceY > 0 then 
+       --需要判断方向
+       if player:getPositionY() < mapCameraPosY then    --在下边
+          self:setCameraPosY(-1,math.abs(speed))
+       end
+    elseif math.abs(distanceY) > GameUtil:VISIBLE_HEIGHT()/4 and distanceY < 0 then
+        if player:getPositionY() >= mapCameraPosY then  --在上边                                                             
+          self:setCameraPosY(1,math.abs(speed))
+        end
+    end
+
+    
+end
 
 function TiledMapScene:setCameraPosX(direction,x)
 	local distanceX = direction * x

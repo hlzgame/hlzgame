@@ -71,44 +71,12 @@ function OriginalSceneView:initTileMap()
     self.backgroundCamera = self:setBackgroundCamera(self.guiBackgroundNode)
     self.mapCamera = self:setMapCamera(self.map)
  
-    --开启触摸
-    self:initKeyBoardListener()
+    --开启键盘控制（win32版本使用）
+    if g_game:getTargetPlatform() == cc.PLATFORM_OS_WINDOWS then 
+       self:initKeyBoardListener()
+    end
 
     
-end
-
-
---这里还有问题 =。= 计算出错
-function OriginalSceneView:refreshPlayerAndCamera(speed)
-    if speed ~= 0 then 
-    	return 
-    end
-	local mapCameraPosX = self.mapCamera:getPositionX()
-	local mapCameraPoxY = self.mapCamera:getPositionY()
-    local distanceX = math.abs(mapCameraPosX - self.player:getPositionX()) 
-    local distanceY = math.abs(mapCameraPoxY - self.player:getPositionY())
-
-    if distanceX > GameUtil:VISIBLE_WIDTH()/4 then 
-       --需要判断方向
-       if self.player:getPositionX() < mapCameraPosX then  --在左边
-       	  self:setCameraPosX(-1,speed)
-       else                                                             --在右边
-       	  self:setCameraPosX(1,speed)
-       end
-       
-    end
-
-    if distanceY > GameUtil:VISIBLE_HEIGHT()/4 then 
-       --需要判断方向
-       if self.player:getPositionY() < mapCameraPoxY then  --在下边
-       	  self:setCameraPosY(-1,speed)
-       else                                                             --在上边
-       	  self:setCameraPosY(1,speed)
-       end
-    end
-
-    -- dump(distanceX) 
-    -- dump(distanceY) 
 end
 
 
@@ -140,7 +108,7 @@ function OriginalSceneView:pressedLeftBtnListener()
     local func = function ( )
     	self.player:setPositionX(self.player:getPositionX() + self.speedLR*10) 
     	local speed = self.speedLR*10
-    	self:refreshPlayerAndCamera(speed)
+    	self:refreshPlayerAndCamera(speed,self.player)
     end
 
     if self.leftMoveHandler ~= nil then 
@@ -157,7 +125,7 @@ function TiledMapScene:pressedRightBtnListener()
 	local func = function ( )
     	self.player:setPositionX(self.player:getPositionX() + self.speedLR*10) 
     	local speed = self.speedLR*10
-    	self:refreshPlayerAndCamera(speed)
+    	self:refreshPlayerAndCamera(speed,self.player)
     end
 
     if self.rightMoveHandler ~= nil then 
@@ -172,7 +140,7 @@ function TiledMapScene:pressedUpBtnListener()
     	local func = function ( )
     	self.player:setPositionY(self.player:getPositionY() + self.speedUD*10) 
     	local speed = self.speedUD*10
-    	self:refreshPlayerAndCamera(speed)
+    	self:refreshPlayerAndCamera(speed,self.player)
     end
 
     if self.upMoveHandler ~= nil then 
@@ -187,7 +155,7 @@ function TiledMapScene:pressedDownBtnListener()
     local func = function ( )
     	self.player:setPositionY(self.player:getPositionY() + self.speedUD*10) 
     	local speed = self.speedUD*10
-    	self:refreshPlayerAndCamera(speed)
+    	self:refreshPlayerAndCamera(speed,self.player)
     end
 
     if self.downMoveHandler ~= nil then 

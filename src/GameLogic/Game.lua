@@ -47,6 +47,18 @@ function Game:start()
 
 end
 
+function Game:getTargetPlatform()
+    local targetPlatform = cc.Application:getInstance():getTargetPlatform()
+    -- if (cc.PLATFORM_OS_IPHONE == targetPlatform) or (cc.PLATFORM_OS_IPAD == targetPlatform) or
+    --     (cc.PLATFORM_OS_ANDROID == targetPlatform) or (cc.PLATFORM_OS_WINDOWS == targetPlatform) or
+    --     (cc.PLATFORM_OS_MAC == targetPlatform) then
+    --     cclog("result is ")
+    --     --require('debugger')()
+
+    -- end
+    return targetPlatform
+end
+
 function Game:enterLoadingScene()
     LoadingSceneView.open()
 end
