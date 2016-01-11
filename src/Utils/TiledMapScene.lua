@@ -8,6 +8,11 @@ TiledMapScene = class("TiledMapScene", function (  )
 end)
 TiledMapScene.__index = TiledMapScene
 
+TiledMapScene.LEFT = 1
+TiledMapScene.RIGHT = 2
+TiledMapScene.UP = 3
+TiledMapScene.DOWN = 4
+
 --[[
     继承于 EventScene的类，需要在ctor() onEnter() onExit() 加上 .super.ctor(self)类似的方法 
 --]]
@@ -67,6 +72,7 @@ function TiledMapScene:onHide(  )
 	
 end
 
+--创建TiledMap
 function TiledMapScene:createTMXTM(file)
 	if self.tiledMap == nil then 
 	   self.tiledMap = cc.TMXTiledMap:create(file)
@@ -84,17 +90,17 @@ end
 
 
   --转tilemap地图      从世界地图坐标转到TiledMap地图坐标
-function TiledMapScene:tileCoordForPosition(tileMap,position) 
-	local x = math.floor(position.x / tileMap:getTileSize().width)
-	local y = math.floor(((tileMap:getMapSize().height * tileMap:getTileSize().height)-position.y) / tileMap:getTileSize().height)
+function TiledMapScene:tileCoordForPosition(position) 
+	local x = math.floor(position.x / self.tiledMap:getTileSize().width)
+	local y = math.floor(((self.tiledMap:getMapSize().height * self.tiledMap:getTileSize().height)-position.y) / self.tiledMap:getTileSize().height)
 	return cc.p(x,y)
 end
 
   --转正常地图         从TiledMap地图坐标转到世界地图坐标
-function TiledMapScene:positionForTileCoord(tileMap,tileCoord)
-	local x = math.floor((tileCoord.x * tileMap:getTileSize().width) + tileMap:getTileSize().width / 2)
-	local y = math.floor((tileMap:getMapSize().height * tileMap:getTileSize().height) -
-		(tileCoord.y * tileMap:getTileSize().height) - tileMap:getTileSize().height / 2)
+function TiledMapScene:positionForTileCoord(tileCoord)
+	local x = math.floor((tileCoord.x * self.tiledMap:getTileSize().width) + self.tiledMap:getTileSize().width / 2)
+	local y = math.floor((self.tiledMap:getMapSize().height * self.tiledMap:getTileSize().height) -
+		(tileCoord.y * self.tiledMap:getTileSize().height) - self.tiledMap:getTileSize().height / 2)
 	return cc.p(x, y)
 end
 
@@ -121,8 +127,9 @@ end
 	    =-= 如果不需要背景的话 则只需要创建一个新相机 就可以了； 如果需求是这样的话，就要创建两个新相机了；
 --]]
 
+--创建背景相机
 function TiledMapScene:setBackgroundCamera(node)
-	--创建背景相机
+	
 	if self.backgroundCamera == nil then
 
         self.backgroundCamera = cc.Camera:createPerspective(60, GameUtil:VISIBLE_WIDTH() / GameUtil:VISIBLE_HEIGHT(), 1, 1000)
@@ -143,8 +150,9 @@ function TiledMapScene:setBackgroundCamera(node)
 
 end
 
+--创建地图相机
 function TiledMapScene:setMapCamera(node)
-	--创建地图相机
+	
 	if self.mapCamera == nil then
 
         self.mapCamera = cc.Camera:createPerspective(60, GameUtil:VISIBLE_WIDTH() / GameUtil:VISIBLE_HEIGHT(), 1, 1000)
@@ -166,8 +174,44 @@ function TiledMapScene:setMapCamera(node)
 
 end
 
+-- --刷新角色坐标信息
+-- function TiledMapScene:refershPlayerPosInfo(speed,player,layer,direction)
+    
+-- end
+--刷新角色坐标信息
+function TiledMapScene:refershPlayerPosInfo(speed,player,layer,direction)
 
---这里还有问题 =。= 计算出错
+	
+	switch(direction) : caseof
+	{
+	 [TiledMapScene.LEFT]  = function()   -- 向左移动
+	      if self:wallDetection(direction,player,layer) == true then 
+             player:setPositionX(player:getPositionX() + speed)
+	      end
+	  end,
+	 [TiledMapScene.RIGHT] = function()   -- 向右移动
+	      if self:wallDetection(direction,player,layer) == true then 
+             player:setPositionX(player:getPositionX() + speed)
+	      end 
+	  end,
+	 [TiledMapScene.UP]    = function()   -- 向上移动
+	  	  if self:wallDetection(direction,player,layer) == true then 
+             player:setPositionY(player:getPositionY() + speed)
+	      end 
+	  end,
+	 [TiledMapScene.DOWN]  = function()   -- 向下移动
+	  	  if self:wallDetection(direction,player,layer) == true then 
+             player:setPositionY(player:getPositionY() + speed)
+	      end   
+	  end,
+    }
+    self:refreshPlayerAndCamera(speed,player)
+
+end
+
+
+--刷新玩家和相机的间距，保持一定的距离显示
+--这里没有问题了 =。= 宝宝修好了
 function TiledMapScene:refreshPlayerAndCamera(speed,player)
 
 	local mapCameraPosX = self.mapCamera:getPositionX()
@@ -196,10 +240,10 @@ function TiledMapScene:refreshPlayerAndCamera(speed,player)
           self:setCameraPosY(1,math.abs(speed))
         end
     end
-
-    
+   
 end
 
+--移动地图相机X轴
 function TiledMapScene:setCameraPosX(direction,x)
 	local distanceX = direction * x
 	local nowPosX = self.mapCamera:getPositionX() + distanceX
@@ -209,6 +253,7 @@ function TiledMapScene:setCameraPosX(direction,x)
 	self.mapCamera:setPositionX(nowPosX)
 end
 
+--移动地图相机Y轴
 function TiledMapScene:setCameraPosY(direction,y)
 	local distanceY = direction * y
 	local nowPosY = self.mapCamera:getPositionY() + distanceY
@@ -216,6 +261,39 @@ function TiledMapScene:setCameraPosY(direction,y)
 		return 
 	end
     self.mapCamera:setPositionY(nowPosY)
+end
+
+
+--检测墙壁 不会自由下落 不能移动
+--需要在移动之前进行判断
+--[[根据传进来的玩家，获取玩家的TiledMap坐标，然后判断脚下那一格是否是墙壁]]
+function TiledMapScene:wallDetection(direction,player,layer)
+    local playerPosX = player:getPositionX()
+    local playerPosY = player:getPositionY()
+
+    local playerTiledMapPos = self:tileCoordForPosition(cc.p(playerPosX,playerPosY))
+
+    local aX,aY = 0,0
+
+    switch(direction) : caseof
+	{
+	 [TiledMapScene.LEFT]  = function() aX,aY = -1, 0  end,
+	 [TiledMapScene.RIGHT] = function() aX,aY =  1, 0  end,
+	 [TiledMapScene.UP]    = function() aX,aY =  0,-2  end,
+	 [TiledMapScene.DOWN]  = function() aX,aY =  0, 1  end,
+    }
+
+    local wallPos = cc.p(playerTiledMapPos.x + aX,playerTiledMapPos.y+aY)
+
+    local gid = layer:getTileGIDAt(wallPos)
+
+    if gid == 0 then 
+       print("没墙，安心撞")
+       return true
+    else
+       print("有墙，慢慢撞")
+       return false
+    end
 end
 
 
@@ -251,6 +329,7 @@ function TiledMapScene:initTouchListener( bSwallow )
 
 end
 
+--初始化键盘响应事件
 function TiledMapScene:initKeyBoardListener()
         --按下事件
 	    local function keyboardPressed(keyCode, event)
@@ -346,9 +425,7 @@ end
     获得一个地图块的GID layer:getTileGIDAt(cc.p(x,y))
     移除一个地图块：    layer:removeTileAt(cc.p(x,y))
     获得当前地图的每块地图的长宽  getMapSize().height   getMapSize().width
-    
-
-
+   
 --]]
 
 

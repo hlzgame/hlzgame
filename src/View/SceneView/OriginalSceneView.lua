@@ -47,8 +47,8 @@ function OriginalSceneView:initTileMap()
 
 
     --加载地图
-	self.map = self:createTMXTM(ORIGINAL_SCENCE_TMX)
-	self.map:setName("self.map")
+	  self.map = self:createTMXTM(ORIGINAL_SCENCE_TMX)
+	  self.map:setName("self.map")
     self:addChild(self.map,5)
     self.map:setAnchorPoint(cc.p(0,0))    
       
@@ -59,7 +59,7 @@ function OriginalSceneView:initTileMap()
     self.player = PlayerView.new()
     self.map:addChild(self.player,10)  
 
-    self.initPlayerPos = self:positionForTileCoord(self.map,cc.p(12,28))
+    self.initPlayerPos = self:positionForTileCoord(cc.p(30,28))
 
     self.player:setPosition(self.initPlayerPos)
 
@@ -75,7 +75,6 @@ function OriginalSceneView:initTileMap()
     if g_game:getTargetPlatform() == cc.PLATFORM_OS_WINDOWS then 
        self:initKeyBoardListener()
     end
-
     
 end
 
@@ -106,9 +105,9 @@ function OriginalSceneView:pressedLeftBtnListener()
 	self.speedLR = -0.5
     self.player:setScaleX(-1)
     local func = function ( )
-    	self.player:setPositionX(self.player:getPositionX() + self.speedLR*10) 
+    	--self.player:setPositionX(self.player:getPositionX() + self.speedLR*10) 
     	local speed = self.speedLR*10
-    	self:refreshPlayerAndCamera(speed,self.player)
+    	self:refershPlayerPosInfo(speed,self.player,self.impactLayer,TiledMapScene.LEFT)
     end
 
     if self.leftMoveHandler ~= nil then 
@@ -120,12 +119,13 @@ function OriginalSceneView:pressedLeftBtnListener()
 end
 
 function TiledMapScene:pressedRightBtnListener()
-    self.speedLR = 0.5
-     self.player:setScaleX(1)
+
+  self.speedLR = 0.5
+  self.player:setScaleX(1)
 	local func = function ( )
-    	self.player:setPositionX(self.player:getPositionX() + self.speedLR*10) 
+    	--self.player:setPositionX(self.player:getPositionX() + self.speedLR*10) 
     	local speed = self.speedLR*10
-    	self:refreshPlayerAndCamera(speed,self.player)
+    	self:refershPlayerPosInfo(speed,self.player,self.impactLayer,TiledMapScene.RIGHT)
     end
 
     if self.rightMoveHandler ~= nil then 
@@ -138,9 +138,9 @@ end
 function TiledMapScene:pressedUpBtnListener()
     self.speedUD = 0.5
     	local func = function ( )
-    	self.player:setPositionY(self.player:getPositionY() + self.speedUD*10) 
+    	--self.player:setPositionY(self.player:getPositionY() + self.speedUD*10) 
     	local speed = self.speedUD*10
-    	self:refreshPlayerAndCamera(speed,self.player)
+    	self:refershPlayerPosInfo(speed,self.player,self.impactLayer,TiledMapScene.UP)
     end
 
     if self.upMoveHandler ~= nil then 
@@ -153,9 +153,9 @@ end
 function TiledMapScene:pressedDownBtnListener()
     self.speedUD = -0.5
     local func = function ( )
-    	self.player:setPositionY(self.player:getPositionY() + self.speedUD*10) 
+    	--self.player:setPositionY(self.player:getPositionY() + self.speedUD*10) 
     	local speed = self.speedUD*10
-    	self:refreshPlayerAndCamera(speed,self.player)
+    	self:refershPlayerPosInfo(speed,self.player,self.impactLayer,TiledMapScene.DOWN)
     end
 
     if self.downMoveHandler ~= nil then 
@@ -193,7 +193,6 @@ function TiledMapScene:releasedDownBtnListener()
        self.downMoveHandler = nil 
     end
 end
-
 
 
 function OriginalSceneView:onEnter()
