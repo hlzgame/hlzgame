@@ -47,8 +47,8 @@ function OriginalSceneView:initTileMap()
 
 
     --加载地图
-	  self.map = self:createTMXTM(ORIGINAL_SCENCE_TMX)
-	  self.map:setName("self.map")
+    self.map = self:createTMXTM(ORIGINAL_SCENCE_TMX)
+    self.map:setName("self.map")
     self:addChild(self.map,5)
     self.map:setAnchorPoint(cc.p(0,0))    
       
@@ -58,8 +58,9 @@ function OriginalSceneView:initTileMap()
 
     self.player = PlayerView.new()
     self.map:addChild(self.player,10)  
-
-    self.initPlayerPos = self:positionForTileCoord(cc.p(30,28))
+ 
+    --初始位置
+    self.initPlayerPos = self:positionForTileCoord(cc.p(60,28))
 
     self.player:setPosition(self.initPlayerPos)
 
@@ -67,9 +68,11 @@ function OriginalSceneView:initTileMap()
         g_scheduler:unscheduleScriptEntry(self.updateBattle);
         self.updateBattle = nil 
     end
-
+    
+    --添加摄像机 （背景相机 和 地图相机）
     self.backgroundCamera = self:setBackgroundCamera(self.guiBackgroundNode)
-    self.mapCamera = self:setMapCamera(self.map)
+    self.mapCamera = self:setMapCamera(self.map,self.player)
+    
  
     --开启键盘控制（win32版本使用）
     if g_game:getTargetPlatform() == cc.PLATFORM_OS_WINDOWS then 
@@ -78,36 +81,10 @@ function OriginalSceneView:initTileMap()
     
 end
 
-
--- function OriginalSceneView:onTouchBegan( x,y )
--- 	print("-----onTouchBegan-------")
---     print(x,y)
---     dump(self.map:convertToNodeSpace(cc.p(x,y)))
---     dump(self.map:convertToNodeSpaceAR(cc.p(x,y)))
---     dump(self.map:convertToWorldSpaceAR(cc.p(x,y)))
---     dump(self.map:convertToWorldSpace(cc.p(x,y)))
- 
--- end
-
--- function OriginalSceneView:onTouchMoved( x,y )
--- 	print("-----onTouchMoved-------")
---     print(x,y)
---     dump(self.map:convertToNodeSpace(cc.p(x,y)))
--- end
-
--- function OriginalSceneView:onTouchEnded( x,y,exJudge )
---     print("-----onTouchEnded-------")
---     print(x,y)
---     dump(self.map:convertToNodeSpace(cc.p(x,y)))
--- end
-
 function OriginalSceneView:pressedLeftBtnListener()
-	self.speedLR = -0.5
-    self.player:setScaleX(-1)
     local func = function ( )
-    	--self.player:setPositionX(self.player:getPositionX() + self.speedLR*10) 
-    	local speed = self.speedLR*10
-    	self:refershPlayerPosInfo(speed,self.player,self.impactLayer,TiledMapScene.LEFT)
+    	
+    	self:refershPlayerPosInfo(self.player,self.impactLayer,TiledMapScene.LEFT)
     end
 
     if self.leftMoveHandler ~= nil then 
@@ -119,13 +96,8 @@ function OriginalSceneView:pressedLeftBtnListener()
 end
 
 function TiledMapScene:pressedRightBtnListener()
-
-  self.speedLR = 0.5
-  self.player:setScaleX(1)
 	local func = function ( )
-    	--self.player:setPositionX(self.player:getPositionX() + self.speedLR*10) 
-    	local speed = self.speedLR*10
-    	self:refershPlayerPosInfo(speed,self.player,self.impactLayer,TiledMapScene.RIGHT)
+    	self:refershPlayerPosInfo(self.player,self.impactLayer,TiledMapScene.RIGHT)
     end
 
     if self.rightMoveHandler ~= nil then 
@@ -136,11 +108,13 @@ function TiledMapScene:pressedRightBtnListener()
 	self.rightMoveHandler = g_scheduler:scheduleScriptFunc(func,0,false) 
 end
 function TiledMapScene:pressedUpBtnListener()
-    self.speedUD = 0.5
-    	local func = function ( )
-    	--self.player:setPositionY(self.player:getPositionY() + self.speedUD*10) 
-    	local speed = self.speedUD*10
-    	self:refershPlayerPosInfo(speed,self.player,self.impactLayer,TiledMapScene.UP)
+    --[[按住向上有这几种状态
+           1、跳跃状态
+           2、向上爬动状态
+           
+    --]]
+    local func = function ( )
+    	self:refershPlayerPosInfo(self.player,self.impactLayer,TiledMapScene.UP)
     end
 
     if self.upMoveHandler ~= nil then 
@@ -151,11 +125,8 @@ function TiledMapScene:pressedUpBtnListener()
 	self.upMoveHandler = g_scheduler:scheduleScriptFunc(func,0,false)
 end
 function TiledMapScene:pressedDownBtnListener()
-    self.speedUD = -0.5
     local func = function ( )
-    	--self.player:setPositionY(self.player:getPositionY() + self.speedUD*10) 
-    	local speed = self.speedUD*10
-    	self:refershPlayerPosInfo(speed,self.player,self.impactLayer,TiledMapScene.DOWN)
+    	self:refershPlayerPosInfo(self.player,self.impactLayer,TiledMapScene.DOWN)
     end
 
     if self.downMoveHandler ~= nil then 

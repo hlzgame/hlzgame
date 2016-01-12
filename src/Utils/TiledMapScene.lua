@@ -12,6 +12,8 @@ TiledMapScene.LEFT = 1
 TiledMapScene.RIGHT = 2
 TiledMapScene.UP = 3
 TiledMapScene.DOWN = 4
+TiledMapScene.JUMP = 5
+TiledMapScene.SQUAT = 6
 
 --[[
     继承于 EventScene的类，需要在ctor() onEnter() onExit() 加上 .super.ctor(self)类似的方法 
@@ -141,6 +143,8 @@ function TiledMapScene:setBackgroundCamera(node)
         self.backgroundCamera:setPosition3D(cc.vec3(0, 0, 550))
 
         self.backgroundCamera:lookAt(cc.vec3(0,0,0), cc.vec3(0,1,0))
+
+        --初始化相机位置
         self.backgroundCamera:setPosition(cc.p(GameUtil:VISIBLE_WIDTH()/2,GameUtil:VISIBLE_HEIGHT()/2))
 
         node:setCameraMask(cc.CameraFlag.USER2)
@@ -151,7 +155,7 @@ function TiledMapScene:setBackgroundCamera(node)
 end
 
 --创建地图相机
-function TiledMapScene:setMapCamera(node)
+function TiledMapScene:setMapCamera(node,player)
 	
 	if self.mapCamera == nil then
 
@@ -165,55 +169,66 @@ function TiledMapScene:setMapCamera(node)
         self.mapCamera:setPosition3D(cc.vec3(0, 0, 550))
 
         self.mapCamera:lookAt(cc.vec3(0,0,0), cc.vec3(0,1,0))
-        self.mapCamera:setPosition(cc.p(GameUtil:VISIBLE_WIDTH()/2,GameUtil:VISIBLE_HEIGHT()/2))
-
+        
         node:setCameraMask(cc.CameraFlag.USER1)
+
+        --初始化摄像机位置 根据当前主角生成的位置 来移动位置
+        self:initCameraPos(player)
+
     end
     
     return self.mapCamera
 
 end
 
--- --刷新角色坐标信息
--- function TiledMapScene:refershPlayerPosInfo(speed,player,layer,direction)
-    
--- end
 --刷新角色坐标信息
-function TiledMapScene:refershPlayerPosInfo(speed,player,layer,direction)
+function TiledMapScene:refershPlayerPosInfo(player,layer,direction)
 
-	
+	local distance = 0 
+
 	switch(direction) : caseof
 	{
 	 [TiledMapScene.LEFT]  = function()   -- 向左移动
 	      if self:wallDetection(direction,player,layer) == true then 
-             player:setPositionX(player:getPositionX() + speed)
+	      	 distance = player:toLeft() --返回位移偏移值
+             --player:setPositionX(player:getPositionX() + speed)
 	      end
 	  end,
 	 [TiledMapScene.RIGHT] = function()   -- 向右移动
 	      if self:wallDetection(direction,player,layer) == true then 
-             player:setPositionX(player:getPositionX() + speed)
+	      	 distance = player:toRight()
+             --player:setPositionX(player:getPositionX() + speed)
 	      end 
 	  end,
 	 [TiledMapScene.UP]    = function()   -- 向上移动
 	  	  if self:wallDetection(direction,player,layer) == true then 
-             player:setPositionY(player:getPositionY() + speed)
+    
 	      end 
 	  end,
 	 [TiledMapScene.DOWN]  = function()   -- 向下移动
 	  	  if self:wallDetection(direction,player,layer) == true then 
-             player:setPositionY(player:getPositionY() + speed)
+            
+	      end   
+	  end,
+	  [TiledMapScene.JUMP]  = function()   -- 跳跃
+	  	  --跳跃是一个持续的过程，在这个期间 需要不断的进行碰撞判断
+
+	  end,
+	  [TiledMapScene.SQUAT]  = function()   -- 下蹲
+	  	  if self:wallDetection(direction,player,layer) == true then 
+             
 	      end   
 	  end,
     }
-    self:refreshPlayerAndCamera(speed,player)
+    self:refreshPlayerAndCamera(distance,player)
 
 end
 
 
 --刷新玩家和相机的间距，保持一定的距离显示
 --这里没有问题了 =。= 宝宝修好了
-function TiledMapScene:refreshPlayerAndCamera(speed,player)
-
+function TiledMapScene:refreshPlayerAndCamera(distance,player)
+    
 	local mapCameraPosX = self.mapCamera:getPositionX()
 	local mapCameraPosY = self.mapCamera:getPositionY()
     local distanceX = mapCameraPosX - player:getPositionX()
@@ -222,25 +237,47 @@ function TiledMapScene:refreshPlayerAndCamera(speed,player)
     if math.abs(distanceX) > GameUtil:VISIBLE_WIDTH()/4 and distanceX > 0 then 
        --需要判断方向
        if player:getPositionX() < mapCameraPosX then  --在左边
-       	  self:setCameraPosX(-1,math.abs(speed))
+       	  self:setCameraPosX(-1,math.abs(distance))
        end
     elseif math.abs(distanceX) > GameUtil:VISIBLE_WIDTH()/4 and distanceX < 0 then
         if player:getPositionX() >= mapCameraPosX then  --在右边                                                               
-          self:setCameraPosX(1,math.abs(speed))
+          self:setCameraPosX(1,math.abs(distance))
         end
     end
 
     if math.abs(distanceY) > GameUtil:VISIBLE_HEIGHT()/4 and distanceY > 0 then 
        --需要判断方向
        if player:getPositionY() < mapCameraPosY then    --在下边
-          self:setCameraPosY(-1,math.abs(speed))
+          self:setCameraPosY(-1,math.abs(distance))
        end
     elseif math.abs(distanceY) > GameUtil:VISIBLE_HEIGHT()/4 and distanceY < 0 then
         if player:getPositionY() >= mapCameraPosY then  --在上边                                                             
-          self:setCameraPosY(1,math.abs(speed))
+          self:setCameraPosY(1,math.abs(distance))
         end
     end
    
+end
+
+--初始化摄像机位置
+function TiledMapScene:initCameraPos(player)
+	local initX = player:getPositionX()
+	local initY = player:getPositionY()
+    
+    --不能超出范围
+	if initX < GameUtil:VISIBLE_WIDTH()/2 then 
+	   initX = GameUtil:VISIBLE_WIDTH()/2 
+	elseif initX > self.maxWidth then
+	   initX = self.maxWidth
+	end
+
+	if initY < GameUtil:VISIBLE_HEIGHT()/2 then 
+	   initY = GameUtil:VISIBLE_HEIGHT()/2 
+	elseif initY > self.maxHeight then
+	   initY = self.maxHeight
+	end
+	
+	self.mapCamera:setPosition(cc.p(initX,initY))
+
 end
 
 --移动地图相机X轴
@@ -277,10 +314,12 @@ function TiledMapScene:wallDetection(direction,player,layer)
 
     switch(direction) : caseof
 	{
-	 [TiledMapScene.LEFT]  = function() aX,aY = -1, 0  end,
-	 [TiledMapScene.RIGHT] = function() aX,aY =  1, 0  end,
-	 [TiledMapScene.UP]    = function() aX,aY =  0,-2  end,
-	 [TiledMapScene.DOWN]  = function() aX,aY =  0, 1  end,
+	 [TiledMapScene.LEFT]   = function() aX,aY = -1, 0  end,
+	 [TiledMapScene.RIGHT]  = function() aX,aY =  1, 0  end,
+	 [TiledMapScene.UP]     = function() aX,aY =  0,-2  end,   
+	 [TiledMapScene.DOWN]   = function() aX,aY =  0, 1  end,
+	 [TiledMapScene.JUMP]   = function() aX,aY =  0,-2  end,
+	 [TiledMapScene.SQUAT]  = function() aX,aY =  0, 1  end,
     }
 
     local wallPos = cc.p(playerTiledMapPos.x + aX,playerTiledMapPos.y+aY)
@@ -288,10 +327,8 @@ function TiledMapScene:wallDetection(direction,player,layer)
     local gid = layer:getTileGIDAt(wallPos)
 
     if gid == 0 then 
-       print("没墙，安心撞")
        return true
-    else
-       print("有墙，慢慢撞")
+    else             --现在其他的都先默认是墙，以后可以扩展
        return false
     end
 end

@@ -82,3 +82,23 @@ end
 function PlayerNode:onHide(  )
 	
 end
+
+--普通向左移动
+function PlayerNode:moveToLeft(speedValue)
+   self:setPositionX(self:getPositionX() - speedValue)
+end
+
+--普通向右移动
+function PlayerNode:moveToRight(speedValue)
+	self:setPositionX(self:getPositionX() + speedValue)
+end
+
+--普通跳跃
+function PlayerNode:commonJump() 
+
+end
+
+--普通下蹲
+function PlayerNode:commonSquat()
+	
+end
