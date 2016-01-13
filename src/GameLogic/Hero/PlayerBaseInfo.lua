@@ -15,11 +15,13 @@ function PlayerBaseInfo:ctor( data )
                      速度
                      能量
                      弹跳力
+                     弹跳高度
 	--]]
 	self.powerValue = 0
 	self.speedValue = 5 
 	self.energyValue = 0
-	self.jumpValue = 0.1
+	self.jumpValue = 5
+	self.jumpHeight = 100
 end
 
 function PlayerBaseInfo:setPlayerBaseInfo(data)
@@ -41,3 +43,8 @@ end
 function PlayerBaseInfo:getPlayerJumpValue()
 	return self.jumpValue
 end
+
+function PlayerBaseInfo:getPlayerJumpHeight()
+	return self.jumpHeight
+end
+

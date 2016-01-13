@@ -6,13 +6,12 @@
 
 --[[
     玩家自身的一个节点
-
 --]]
 require("GameLogic.Hero.PlayerBaseInfo")
 
 PlayerView = class("PlayerView",PlayerNode)
 
-function PlayerView:ctor()
+function PlayerView:ctor(parent)
 	PlayerView.super.ctor(self)
 
 	local sprite = cc.Sprite:create("publish/resource/player.png")
@@ -28,8 +27,13 @@ function PlayerView:ctor()
     
     self:initPlayer()
     --父场景
-	self.parentScene = nil 
+	self.parentScene = parent 
+	self:setParentScene(parent)
+
+
 end
+
+
 
 function PlayerView:initPlayer()
 
@@ -42,7 +46,7 @@ function PlayerView:initPlayer()
     self.speedValue = self.playerInfo:getPlayerSpeedValue()
     self.energyValue = self.playerInfo:getPlayerEnergyValue()
     self.jumpValue = self.playerInfo:getPlayerJumpValue()
-	
+	self.jumpHeight = self.playerInfo:getPlayerJumpHeight()
 end
 
 function PlayerView:getTiledMapScene(scene)
@@ -61,10 +65,23 @@ function PlayerView:onExit()
     PlayerView.super.onExit(self)
 end
 
+function PlayerView:openOrColseGravity(flag)
+	self:setGravity(flag)
+	if flag == true then 
+       self:openGravity()
+	else
+       if self.gravityHandler ~= nil then 
+	       g_scheduler:unscheduleScriptEntry(self.gravityHandler)
+	       self.gravityHandler = nil 
+	    end
+	end
+	-- body
+end
+
 --普通向左移动
 function PlayerView:toLeft()
 	self:setScaleX(-1)
-	local distance = self.speedValue*1
+	local distance = self.speedValue/1
 	self:moveToLeft(distance)
 	return distance
 end
@@ -72,14 +89,83 @@ end
 --普通向右移动
 function PlayerView:toRight()
 	self:setScaleX(1)
-	local distance = self.speedValue*1
+	local distance = self.speedValue/1
 	self:moveToRight(distance)
 	return distance
 end
 
+--普通向上移动
+function PlayerView:toUp()
+	local distance = self.speedValue/2
+	self:moveToUp(distance)
+	return distance
+end
+
+--普通向下移动
+function PlayerView:toDown()
+	local distance = self.speedValue/2
+	self:moveToDown(distance)
+	return distance
+end
+
+function PlayerView:openGravity()
+	
+	if self:getIsGravity() == true then 
+
+        local distance = self.jumpValue/1
+
+        local func = function ( )
+            print("-----gravity")
+            self:fallWithGravity(distance)    
+	    end
+
+	    if self.gravityHandler ~= nil then 
+	       g_scheduler:unscheduleScriptEntry(self.gravityHandler)
+	       self.gravityHandler = nil 
+	    end
+		
+		self.gravityHandler = g_scheduler:scheduleScriptFunc(func,0,false) 
+	else
+	    if self.gravityHandler ~= nil then 
+	       g_scheduler:unscheduleScriptEntry(self.gravityHandler)
+	       self.gravityHandler = nil 
+	    end
+    end
+end
+
 --普通跳跃
-function PlayerView:jump() 
-   self:setPositionY(self:getPositionY() + self.jumpValue)
+function PlayerView:jump(parent)
+    if self:getIsJump() == false then 
+       dump(self:getIsJump())
+       self:setIsJump(true)
+       local distance = self.jumpValue*2
+       local jumpHeight = self:getPositionY() + self.jumpHeight
+
+       local func = function ( )
+            print("self:getPositionY():"..self:getPositionY().."   jumpHeight:"..jumpHeight)
+	        if self:getPositionY() <= jumpHeight and parent:wallDetection(TiledMapScene.JUMP,self) == true then
+	        	self:openOrColseGravity(false)
+	        	print("------")
+	            --self:commonJump(distance)
+	            self:setPositionY(self:getPositionY() + distance)
+	            parent:refreshPlayerAndCamera(distance,self)
+	        else
+	            if self.jumpHandler ~= nil then 
+			       g_scheduler:unscheduleScriptEntry(self.jumpHandler)
+			       self.jumpHandler = nil 
+			       self:openOrColseGravity(true)
+			    end
+	        end
+
+	    end
+
+	    if self.jumpHandler ~= nil then 
+	       g_scheduler:unscheduleScriptEntry(self.jumpHandler)
+	       self.jumpHandler = nil 
+	    end
+		
+		self.jumpHandler = g_scheduler:scheduleScriptFunc(func,0,false) 
+    end
 end
 
 --普通下蹲

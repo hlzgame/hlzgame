@@ -87,7 +87,11 @@ function TiledMapScene:createTMXTM(file)
 end
 
 function TiledMapScene:getLayer(layerName)
-    return self.tiledMap:getLayer(layerName)
+	local layer = self.tiledMap:getLayer(layerName)
+	if layerName == IMPACT_LAYER then 
+	   self.impactLayer = layer
+	end
+    return layer
 end
 
 
@@ -182,45 +186,50 @@ function TiledMapScene:setMapCamera(node,player)
 end
 
 --刷新角色坐标信息
-function TiledMapScene:refershPlayerPosInfo(player,layer,direction)
+function TiledMapScene:refershPlayerPosInfo(player,direction)
 
 	local distance = 0 
 
 	switch(direction) : caseof
 	{
 	 [TiledMapScene.LEFT]  = function()   -- 向左移动
-	      if self:wallDetection(direction,player,layer) == true then 
-	      	 distance = player:toLeft() --返回位移偏移值
-             --player:setPositionX(player:getPositionX() + speed)
+	      if self:wallDetection(direction,player) == true then 
+	      	 distance = player:toLeft()   -- 返回位移偏移值
+	      	 self:refreshPlayerAndCamera(distance,player)
 	      end
 	  end,
 	 [TiledMapScene.RIGHT] = function()   -- 向右移动
-	      if self:wallDetection(direction,player,layer) == true then 
+	      if self:wallDetection(direction,player) == true then 
 	      	 distance = player:toRight()
-             --player:setPositionX(player:getPositionX() + speed)
+	      	 self:refreshPlayerAndCamera(distance,player)
 	      end 
 	  end,
 	 [TiledMapScene.UP]    = function()   -- 向上移动
-	  	  if self:wallDetection(direction,player,layer) == true then 
-    
+	  	  if self:wallDetection(direction,player) == true then 
+             distance = player:toUp()
+             self:refreshPlayerAndCamera(distance,player)
 	      end 
 	  end,
 	 [TiledMapScene.DOWN]  = function()   -- 向下移动
-	  	  if self:wallDetection(direction,player,layer) == true then 
-            
+	  	  if self:wallDetection(direction,player) == true then 
+             distance = player:toDown()
+             self:refreshPlayerAndCamera(distance,player)
 	      end   
 	  end,
 	  [TiledMapScene.JUMP]  = function()   -- 跳跃
 	  	  --跳跃是一个持续的过程，在这个期间 需要不断的进行碰撞判断
-
+          if self:wallDetection(direction,player) == true then 
+          	  print("jump")
+              player:jump(self)
+	      end   
 	  end,
 	  [TiledMapScene.SQUAT]  = function()   -- 下蹲
-	  	  if self:wallDetection(direction,player,layer) == true then 
+	  	  if self:wallDetection(direction,player) == true then 
              
 	      end   
 	  end,
     }
-    self:refreshPlayerAndCamera(distance,player)
+    
 
 end
 
@@ -304,7 +313,7 @@ end
 --检测墙壁 不会自由下落 不能移动
 --需要在移动之前进行判断
 --[[根据传进来的玩家，获取玩家的TiledMap坐标，然后判断脚下那一格是否是墙壁]]
-function TiledMapScene:wallDetection(direction,player,layer)
+function TiledMapScene:wallDetection(direction,player)
     local playerPosX = player:getPositionX()
     local playerPosY = player:getPositionY()
 
@@ -324,7 +333,7 @@ function TiledMapScene:wallDetection(direction,player,layer)
 
     local wallPos = cc.p(playerTiledMapPos.x + aX,playerTiledMapPos.y+aY)
 
-    local gid = layer:getTileGIDAt(wallPos)
+    local gid = self.impactLayer:getTileGIDAt(wallPos)
 
     if gid == 0 then 
        return true

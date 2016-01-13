@@ -56,8 +56,12 @@ function OriginalSceneView:initTileMap()
     --self.backGroundLayer = self:getLayer(BACKGROUND_LAYER)
     self.impactLayer:setVisible(false)
 
-    self.player = PlayerView.new()
-    self.map:addChild(self.player,10)  
+    self.player = PlayerView.new(self)
+    self.map:addChild(self.player,10) 
+    self.player:setParentScene(self)
+
+
+    self.player:openOrColseGravity(true)
  
     --初始位置
     self.initPlayerPos = self:positionForTileCoord(cc.p(60,28))
@@ -84,7 +88,7 @@ end
 function OriginalSceneView:pressedLeftBtnListener()
     local func = function ( )
     	
-    	self:refershPlayerPosInfo(self.player,self.impactLayer,TiledMapScene.LEFT)
+    	self:refershPlayerPosInfo(self.player,TiledMapScene.LEFT)
     end
 
     if self.leftMoveHandler ~= nil then 
@@ -95,9 +99,9 @@ function OriginalSceneView:pressedLeftBtnListener()
 	self.leftMoveHandler = g_scheduler:scheduleScriptFunc(func,0,false) 
 end
 
-function TiledMapScene:pressedRightBtnListener()
+function OriginalSceneView:pressedRightBtnListener()
 	local func = function ( )
-    	self:refershPlayerPosInfo(self.player,self.impactLayer,TiledMapScene.RIGHT)
+    	self:refershPlayerPosInfo(self.player,TiledMapScene.RIGHT)
     end
 
     if self.rightMoveHandler ~= nil then 
@@ -107,26 +111,33 @@ function TiledMapScene:pressedRightBtnListener()
 	
 	self.rightMoveHandler = g_scheduler:scheduleScriptFunc(func,0,false) 
 end
-function TiledMapScene:pressedUpBtnListener()
+function OriginalSceneView:pressedUpBtnListener()
     --[[按住向上有这几种状态
            1、跳跃状态
            2、向上爬动状态
-           
-    --]]
-    local func = function ( )
-    	self:refershPlayerPosInfo(self.player,self.impactLayer,TiledMapScene.UP)
-    end
 
-    if self.upMoveHandler ~= nil then 
-       g_scheduler:unscheduleScriptEntry(self.upMoveHandler)
-       self.upMoveHandler = nil 
+    --]]
+    local isJump = true
+    if isJump == true then 
+        self:refershPlayerPosInfo(self.player,TiledMapScene.JUMP)
+    elseif isJump == false then
+        local func = function ( )
+            self:refershPlayerPosInfo(self.player,TiledMapScene.UP)
+        end
+
+        if self.upMoveHandler ~= nil then 
+           g_scheduler:unscheduleScriptEntry(self.upMoveHandler)
+           self.upMoveHandler = nil 
+        end
+        
+        self.upMoveHandler = g_scheduler:scheduleScriptFunc(func,0,false)
     end
-	
-	self.upMoveHandler = g_scheduler:scheduleScriptFunc(func,0,false)
+        --todo
+    
 end
-function TiledMapScene:pressedDownBtnListener()
+function OriginalSceneView:pressedDownBtnListener()
     local func = function ( )
-    	self:refershPlayerPosInfo(self.player,self.impactLayer,TiledMapScene.DOWN)
+    	self:refershPlayerPosInfo(self.player,TiledMapScene.DOWN)
     end
 
     if self.downMoveHandler ~= nil then 
@@ -140,25 +151,25 @@ end
 
 
 --松开事件
-function TiledMapScene:releasedLeftBtnListener()
+function OriginalSceneView:releasedLeftBtnListener()
 	if self.leftMoveHandler ~= nil then 
        g_scheduler:unscheduleScriptEntry(self.leftMoveHandler)
        self.leftMoveHandler = nil 
     end
 end
-function TiledMapScene:releasedRightBtnListener()
+function OriginalSceneView:releasedRightBtnListener()
     if self.rightMoveHandler ~= nil then 
        g_scheduler:unscheduleScriptEntry(self.rightMoveHandler)
        self.rightMoveHandler = nil 
     end
 end
-function TiledMapScene:releasedUpBtnListener()
+function OriginalSceneView:releasedUpBtnListener()
     if self.upMoveHandler ~= nil then 
        g_scheduler:unscheduleScriptEntry(self.upMoveHandler)
        self.upMoveHandler = nil 
     end
 end
-function TiledMapScene:releasedDownBtnListener()
+function OriginalSceneView:releasedDownBtnListener()
     if self.downMoveHandler ~= nil then 
        g_scheduler:unscheduleScriptEntry(self.downMoveHandler)
        self.downMoveHandler = nil 
