@@ -6,19 +6,27 @@
  <tileset firstgid="2" name="Inside_A4" tilewidth="32" tileheight="32">
   <image source="examples/Inside_A4.png" width="512" height="480"/>
  </tileset>
+ <tileset firstgid="242" name="Dungeon_B" tilewidth="32" tileheight="32">
+  <image source="../../../Tiled/examples/Dungeon_B.png" width="512" height="512"/>
+ </tileset>
  <layer name="BackGroud" width="100" height="30">
   <data encoding="base64" compression="zlib">
    eJztwTEBAAAAwqD1T20MH6AAAAAAAAAAAAAAAOBvLuAAAQ==
   </data>
  </layer>
- <layer name="Map" width="100" height="30">
+ <layer name="Map1" width="100" height="30">
   <data encoding="base64" compression="zlib">
-   eJzt2rENg0AQBdHrv5OjCtyB3QHuwO7Al5uVvrxInmCetFoEl00AAdsYY3NQIwZ7sNiDxR4s9mCxB4s9WOzBYg8We7DYg8UeLPZgsQeLPVjswWIPFnuw2IPlrMcszs6TZ9VZ/SbtMYNr9dmDxR4sVY/qXVHds8s10u+rfc0t2OpJe9zXPIKtnrTHseYZbPWkPV5r3sFWz7//G3a+5wMjRdut
+   eJztyLkNACAMALEwFgvw7L9QMgB1RGFL11wEAAAAAAAAAAAAANBlDv3Urs6j5bf/WyXfqTMN
+  </data>
+ </layer>
+ <layer name="Map2" width="100" height="30">
+  <data encoding="base64" compression="zlib">
+   eJztzrsRQEAYhdHdsjTgUYFRAx3QiBJ06Q8EAgGJHeacmS+50U0JAAAAAAAAAAAAAL5nzCmt0ZRLP3mmyv+pPzVHW7REw1Hpf3dqovai2v763kU79hU2Dw==
   </data>
  </layer>
  <layer name="Impact" width="100" height="30" opacity="0.39">
   <data encoding="base64" compression="zlib">
-   eJzt2rENACAQA7Fn/6UZgIYKrrClTHBt1swsS40GPVr0aNGjRY8WPVr0aNGjRY8WPVr0aNGjRY8WPVr0aNGjRY8WPVr0aNGjRY8WPVr0aNGj5baHH9cberTo0aJHy+/fsJ3bdJgBKQ==
+   eJzt2rEJADAMBDFn/6UzQzo5nOB7w7U+M3MatRjqYamHpR6WeljqYamHpR6WeljqYamHpR6WeljqYamHpR6WeljqYamHpR6WeljqYamHpR6WeljqYfm5x8b/y233vtjcozm7tIEBBw==
   </data>
  </layer>
 </map>

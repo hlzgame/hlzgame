@@ -334,6 +334,7 @@ function TiledMapScene:wallDetection(direction,player)
     local wallPos = cc.p(playerTiledMapPos.x + aX,playerTiledMapPos.y+aY)
 
     local gid = self.impactLayer:getTileGIDAt(wallPos)
+    
 
     if gid == 0 then 
        return true

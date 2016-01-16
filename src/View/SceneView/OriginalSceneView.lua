@@ -58,8 +58,6 @@ function OriginalSceneView:initTileMap()
 
     self.player = PlayerView.new(self)
     self.map:addChild(self.player,10) 
-    self.player:setParentScene(self)
-
 
     self.player:openOrColseGravity(true)
  
@@ -88,7 +86,8 @@ end
 function OriginalSceneView:pressedLeftBtnListener()
     local func = function ( )
     	
-    	self:refershPlayerPosInfo(self.player,TiledMapScene.LEFT)
+    	--self:refershPlayerPosInfo(self.player,TiledMapScene.LEFT)
+        self.player:refershPos(TiledMapScene.LEFT)
     end
 
     if self.leftMoveHandler ~= nil then 
@@ -101,7 +100,8 @@ end
 
 function OriginalSceneView:pressedRightBtnListener()
 	local func = function ( )
-    	self:refershPlayerPosInfo(self.player,TiledMapScene.RIGHT)
+    	--self:refershPlayerPosInfo(self.player,TiledMapScene.RIGHT)
+        self.player:refershPos(TiledMapScene.RIGHT)
     end
 
     if self.rightMoveHandler ~= nil then 
@@ -119,10 +119,12 @@ function OriginalSceneView:pressedUpBtnListener()
     --]]
     local isJump = true
     if isJump == true then 
-        self:refershPlayerPosInfo(self.player,TiledMapScene.JUMP)
+        --self:refershPlayerPosInfo(self.player,TiledMapScene.JUMP)
+        self.player:refershPos(TiledMapScene.JUMP)
     elseif isJump == false then
         local func = function ( )
-            self:refershPlayerPosInfo(self.player,TiledMapScene.UP)
+            --self:refershPlayerPosInfo(self.player,TiledMapScene.UP)
+            self.player:refershPos(TiledMapScene.UP)
         end
 
         if self.upMoveHandler ~= nil then 
@@ -137,7 +139,8 @@ function OriginalSceneView:pressedUpBtnListener()
 end
 function OriginalSceneView:pressedDownBtnListener()
     local func = function ( )
-    	self:refershPlayerPosInfo(self.player,TiledMapScene.DOWN)
+    	--self:refershPlayerPosInfo(self.player,TiledMapScene.DOWN)
+        self.player:refershPos(TiledMapScene.DOWN)
     end
 
     if self.downMoveHandler ~= nil then 

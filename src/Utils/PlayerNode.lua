@@ -110,12 +110,10 @@ end
 
 function PlayerNode:fallWithGravity(gravity)
 	--是恒定下降速度 还是加上重力加速度
-  
     if self.parentScene:wallDetection(TiledMapScene.DOWN,self) == true then --可以下降
        self:setPositionY(self:getPositionY() - gravity)
        self.parentScene:refreshPlayerAndCamera(gravity,self)
-       
-    else  --不能下降 如果当前处于跳跃阶段，则结束跳跃阶段
+    elseif self.parentScene:wallDetection(TiledMapScene.DOWN,self) == false then  --不能下降 如果当前处于跳跃阶段，则结束跳跃阶段
        if self:getIsJump() == true then 
        	  self:setIsJump(false)
        end
@@ -153,3 +151,4 @@ end
 function PlayerNode:commonSquat()
 	
 end
+

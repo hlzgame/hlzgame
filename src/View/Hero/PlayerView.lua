@@ -49,9 +49,6 @@ function PlayerView:initPlayer()
 	self.jumpHeight = self.playerInfo:getPlayerJumpHeight()
 end
 
-function PlayerView:getTiledMapScene(scene)
-    self.parentScene = scene
-end
 
 function PlayerView:initEvent()
 
@@ -115,13 +112,7 @@ function PlayerView:openGravity()
         local distance = self.jumpValue/1
 
         local func = function ( )
-            print("-----gravity")
-            self:fallWithGravity(distance)    
-	    end
-
-	    if self.gravityHandler ~= nil then 
-	       g_scheduler:unscheduleScriptEntry(self.gravityHandler)
-	       self.gravityHandler = nil 
+	       	self:fallWithGravity(distance)     
 	    end
 		
 		self.gravityHandler = g_scheduler:scheduleScriptFunc(func,0,false) 
@@ -136,17 +127,15 @@ end
 --普通跳跃
 function PlayerView:jump(parent)
     if self:getIsJump() == false then 
-       dump(self:getIsJump())
        self:setIsJump(true)
+       self:openOrColseGravity(false)
        local distance = self.jumpValue*2
        local jumpHeight = self:getPositionY() + self.jumpHeight
 
        local func = function ( )
-            print("self:getPositionY():"..self:getPositionY().."   jumpHeight:"..jumpHeight)
+            --print("self:getPositionY():"..self:getPositionY().."   jumpHeight:"..jumpHeight)
 	        if self:getPositionY() <= jumpHeight and parent:wallDetection(TiledMapScene.JUMP,self) == true then
-	        	self:openOrColseGravity(false)
-	        	print("------")
-	            --self:commonJump(distance)
+	        	
 	            self:setPositionY(self:getPositionY() + distance)
 	            parent:refreshPlayerAndCamera(distance,self)
 	        else
@@ -171,4 +160,48 @@ end
 --普通下蹲
 function PlayerView:squat()
 	
+end
+
+function PlayerView:refershPos(direction)
+	local distance = 0 
+
+	switch(direction) : caseof
+	{
+	 [TiledMapScene.LEFT]  = function()   -- 向左移动
+	      if self.parentScene:wallDetection(direction,self) == true then 
+	      	 distance = self:toLeft()   -- 返回位移偏移值
+	      	 self.parentScene:refreshPlayerAndCamera(distance,self)
+	      end
+	  end,
+	 [TiledMapScene.RIGHT] = function()   -- 向右移动
+	      if self.parentScene:wallDetection(direction,self) == true then 
+	      	 distance = self:toRight()
+	      	 self.parentScene:refreshPlayerAndCamera(distance,self)
+	      end 
+	  end,
+	 [TiledMapScene.UP]    = function()   -- 向上移动
+	  	  if self.parentScene:wallDetection(direction,self) == true then 
+             distance = self:toUp()
+             self.parentScene:refreshPlayerAndCamera(distance,self)
+	      end 
+	  end,
+	 [TiledMapScene.DOWN]  = function()   -- 向下移动
+	  	  if self.parentScene:wallDetection(direction,self) == true then 
+             distance = self:toDown()
+             self.parentScene:refreshPlayerAndCamera(distance,self)
+	      end   
+	  end,
+	  [TiledMapScene.JUMP]  = function()   -- 跳跃
+	  	  --跳跃是一个持续的过程，在这个期间 需要不断的进行碰撞判断
+          if self.parentScene:wallDetection(direction,self) == true then 
+          	  print("jump")
+              self:jump(self)
+	      end   
+	  end,
+	  [TiledMapScene.SQUAT]  = function()   -- 下蹲
+	  	  if self.parentScene:wallDetection(direction,self) == true then 
+             
+	      end   
+	  end,
+    }
 end
