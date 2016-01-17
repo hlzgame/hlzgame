@@ -7,6 +7,8 @@
 --[[
     玩家自身的一个节点
 --]]
+require("Utils.StateMachine")
+
 require("GameLogic.Hero.PlayerBaseInfo")
 
 PlayerView = class("PlayerView",PlayerNode)
@@ -47,6 +49,8 @@ function PlayerView:initPlayer()
     self.energyValue = self.playerInfo:getPlayerEnergyValue()
     self.jumpValue = self.playerInfo:getPlayerJumpValue()
 	self.jumpHeight = self.playerInfo:getPlayerJumpHeight()
+
+	self:initStateMachine()
 end
 
 
@@ -125,7 +129,7 @@ function PlayerView:openGravity()
 end
 
 --普通跳跃
-function PlayerView:jump(parent)
+function PlayerView:jump()
     if self:getIsJump() == false then 
        self:setIsJump(true)
        self:openOrColseGravity(false)
@@ -134,10 +138,10 @@ function PlayerView:jump(parent)
 
        local func = function ( )
             --print("self:getPositionY():"..self:getPositionY().."   jumpHeight:"..jumpHeight)
-	        if self:getPositionY() <= jumpHeight and parent:wallDetection(TiledMapScene.JUMP,self) == true then
+	        if self:getPositionY() <= jumpHeight and self.parentScene:wallDetection(TiledMapScene.JUMP,self) == true then
 	        	
 	            self:setPositionY(self:getPositionY() + distance)
-	            parent:refreshPlayerAndCamera(distance,self)
+	            self.parentScene:refreshPlayerAndCamera(distance,self)
 	        else
 	            if self.jumpHandler ~= nil then 
 			       g_scheduler:unscheduleScriptEntry(self.jumpHandler)
@@ -155,11 +159,59 @@ function PlayerView:jump(parent)
 		
 		self.jumpHandler = g_scheduler:scheduleScriptFunc(func,0,false) 
     end
+
+    --
 end
 
 --普通下蹲
 function PlayerView:squat()
 	
+end
+
+--初始化 动作状态机
+--这里需要好好划分一下
+--[[
+    onbefore clear - clear事件执行前的回调
+	onbefore event - 任何事件执行前的回调
+	onleave red - 离开红色状态时的回调
+	onleave state - 离开任何状态时的回调
+	onenter green - 进入绿色状态时的回调
+	onenter state - 进入任何状态时的回调
+	onafter clear - clear事件完成之后的回调
+	onafter event - 任何事件完成之后的回调
+
+
+    self.fsm:isReady()-返回状态机是否就绪
+	self.fsm:getState()-返回当前状态
+	self.fsm:isState(state)-判断当前状态是否是参数state状态
+	self.fsm:canDoEvent(eventName)-当前状态如果能完成eventName对应的event的状态转换，则返回true
+	self.fsm:cannotDoEvent(eventName)-当前状态如果不能完成eventName对应的event的状态转换，则返回true
+	self.fsm:isFinishedState()-当前状态如果是最终状态，则返回true
+	self.fsm:doEventForce(name, ...)-强制对当前状态进行转换
+
+
+]]
+function PlayerView:initStateMachine( )
+	self.fsm = StateMachine.new()
+
+	self.fsm:setupState({
+		initial = "green",
+		events = {
+		          {name = "warn",from = "green",to = "yellow"},
+		          {name = "panic", from = "green", to = "red" },
+			      {name = "calm", from = "red", to = "yellow"},
+			      {name = "clear", from = "yellow", to = "green"      },
+			    },
+        callbacks = {
+	    onbeforestart = function(event) print("[FSM] STARTING UP") end,
+	    onstart = function(event) print("[FSM] READY") end,
+	    onbeforewarn = function(event) print("[FSM] START EVENT: warn!") end,
+	    onbeforepanic = function(event) print("[FSM] START EVENT: panic!") end,
+	    onbeforecalm = function(event) print("[FSM] START EVENT: calm!") end,
+	    onbeforeclear = function(event) print("[FSM] START EVENT: clear!") end,
+	    onwarn = function(event) print("[FSM] FINISH EVENT: warn!") end, },
+	})
+	self.fsm:doEvent("warn")
 end
 
 function PlayerView:refershPos(direction)
@@ -194,8 +246,7 @@ function PlayerView:refershPos(direction)
 	  [TiledMapScene.JUMP]  = function()   -- 跳跃
 	  	  --跳跃是一个持续的过程，在这个期间 需要不断的进行碰撞判断
           if self.parentScene:wallDetection(direction,self) == true then 
-          	  print("jump")
-              self:jump(self)
+              self:jump()
 	      end   
 	  end,
 	  [TiledMapScene.SQUAT]  = function()   -- 下蹲
