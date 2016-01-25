@@ -21,7 +21,7 @@ function PlayerBaseInfo:ctor( data )
 	self.speedValue = 5 
 	self.energyValue = 0
 	self.jumpValue = 5
-	self.jumpHeight = 100
+	self.jumpHeight = 150
 end
 
 function PlayerBaseInfo:setPlayerBaseInfo(data)

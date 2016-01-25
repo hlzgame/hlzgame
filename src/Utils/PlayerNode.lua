@@ -122,7 +122,7 @@ end
 
 --普通向左移动
 function PlayerNode:moveToLeft(distance)
-   self:setPositionX(self:getPositionX() - distance)
+   
 end
 
 --普通向右移动
@@ -142,7 +142,6 @@ end
 
 --普通跳跃
 function PlayerNode:commonJump(distance) 
-	print("------"..distance)
     self:setPositionY(self:getPositionY() + distance)
 end
 
@@ -186,8 +185,8 @@ end
     state:
 
 	    idle    待机 
-	    walk    走路
-	    run     跑动
+	    --walk    走路(暂时不用这些状态)
+	    --run     跑动
 	    jump    跳跃
 	    squat   下蹲
 	    roll    滚动
@@ -201,8 +200,6 @@ end
     event:
 
 	    isJump    我要跳
-	    isWalk    我要走动
-	    isRun     我要跑
 	    isDrop    我要下降
 	    isAttack  我要攻击
 	    isSkill   我要放技能
@@ -210,8 +207,6 @@ end
 
 	逻辑整理：
 	isJump   在 { idle walk run climb } 可以进行 jump 
-    isWalk   在 { idle walk jump } 可以进行 walk
-    isRun    在 { walk } 可以进行 run
     isAttack 在 { "idle","walk","jump","run","defend","drop" } 可以进行 attack
     isSkill  在 { "idle","walk","jump","run","defend","drop" } 可以进行 skill
 
@@ -226,30 +221,38 @@ function PlayerNode:initStateMachine( )
 	self.fsm:setupState({
 		initial = "idle",
 		events = {
-		          {name = "stop", from = {"walk","jump","run","defend","attack","skill"}, to = "idle"},
-		          {name = "isJump",from = {"idle","walk","run","climb"},to = "jump" },
-		          {name = "isWalk", from = {"idle","walk","jump"}, to = "walk" },
-			      {name = "isRun", from = "walk", to = "run"},
-			      {name = "isAttack", from = {"idle","walk","jump","run","defend"}, to = "attack"},
-			      {name = "isSkill", from = {"idle","walk","jump","run","defend"}, to = "skill"},
+		          {name = "stop",     from = {"jump","defend","attack","skill","drop"}, to = "idle"},
+		          {name = "isJump",   from = {"idle","climb"},                          to = "jump" },
+			      {name = "isAttack", from = {"idle","jump","defend","drop"},           to = "attack"},
+			      {name = "isSkill",  from = {"idle","jump","defend"},                  to = "skill"},
+			      {name = "isDrop",   from = {"jump"},                                  to = "drop"},
 			    },
         callbacks = {
 				   onbeforestart = function(event) print("[FSM] STARTING UP") end,
 				   onstart = function(event) print("[FSM] READY") end,
 				   --在跳跃之前执行事件 关闭重力
-				   onbeforeisJump = function(event) print("onbeforeisJump") end,--self:openOrColseGravity(false) end,				    
+				   onbeforeisJump = function(event) self:openOrColseGravity(false) end,				    
 				   --跳跃结束之后执行事件 开启重力
-				   onafterisJump  = function(event) print("onafterisJump") end,--self:openOrColseGravity(false) end,       
+				   onafterisJump  = function(event)  end,       
                    onenterjump = function(event) self:jump() end,--self:openOrColseGravity(false) end,
                    onleavejump = function(event)  end,--self:openOrColseGravity(false) end,
 				   onenteridle = function(event)  end,
+				   onenterdrop = function(event) self:openOrColseGravity(true) end,
+				   onenterstop = function(event) self:unscheduleHandler() end,
 			    },
 	})
 end
 
+function PlayerNode:unscheduleHandler()
+	-- body
+end
+
 --转换状态
 function PlayerNode:doEvent(event,...)
-   self.fsm:doEvent(event,...)
+	--dump(self:canDoEvent(event))
+	if self:canDoEvent(event) == true then
+       self.fsm:doEvent(event,...)
+    end
 end
 
 --强制转换
@@ -265,4 +268,8 @@ end
 --当前状态如果不能完成eventName对应的event的状态转换，则返回true
 function PlayerNode:cannotDoEvent(event,...)
 	return self.fsm:cannotDoEvent(event,...)
+end
+
+function PlayerNode:getState()
+	return self.fsm:getState()
 end

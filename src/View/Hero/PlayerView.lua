@@ -30,6 +30,9 @@ function PlayerView:ctor(parent)
 	self.parentScene = parent 
 	self:setParentScene(parent)
 
+	self.isMoveLeft = false
+	self.isMoveRight = false
+
 
 end
 
@@ -80,19 +83,61 @@ function PlayerView:openOrColseGravity(flag)
 end
 
 --普通向左移动
-function PlayerView:toLeft()
-	self:setScaleX(-1)
-	local distance = self.speedValue/1
-	self:moveToLeft(distance)
-	return distance
+function PlayerView:toLeft()	
+
+    if self.parentScene:wallDetection(TiledMapScene.LEFT,self) == true and self.isMoveLeft == false  then
+
+		local func = function ( )
+	    	if self.parentScene:wallDetection(TiledMapScene.LEFT,self) == true then
+		  	   self:setScaleX(-1)
+			   local distance = self.speedValue/1
+			   self:setPositionX(self:getPositionX() - distance)
+		  	   self.parentScene:refreshPlayerAndCamera(distance,self)
+		    end	
+	    end
+
+	    self:removeLeftMoveHandler()
+		self.isMoveLeft = true
+		self.leftMoveHandler = g_scheduler:scheduleScriptFunc(func,0,false) 
+
+    end
+
 end
 
 --普通向右移动
 function PlayerView:toRight()
-	self:setScaleX(1)
-	local distance = self.speedValue/1
-	self:moveToRight(distance)
-	return distance
+
+     if self.parentScene:wallDetection(TiledMapScene.RIGHT,self) == true and self.isMoveRight == false then
+		local func = function ( )	
+	    	if self.parentScene:wallDetection(TiledMapScene.RIGHT,self) == true then
+		  	   self:setScaleX(1)
+			   local distance = self.speedValue/1
+			   self:setPositionX(self:getPositionX() + distance)
+		  	   self.parentScene:refreshPlayerAndCamera(distance,self)
+		    end	
+	    end
+	    self:removeRightMoveHandler()
+
+	    self.isMoveRight = true
+		self.rightMoveHandler = g_scheduler:scheduleScriptFunc(func,0,false) 
+    end
+
+end
+
+function PlayerView:removeRightMoveHandler()
+	if self.rightMoveHandler ~= nil then 
+       g_scheduler:unscheduleScriptEntry(self.rightMoveHandler)
+       self.rightMoveHandler = nil 
+       self.isMoveRight = false
+    end	
+end
+
+function PlayerView:removeLeftMoveHandler()
+	if self.leftMoveHandler ~= nil then 
+       g_scheduler:unscheduleScriptEntry(self.leftMoveHandler)
+       self.leftMoveHandler = nil 
+       self.isMoveLeft = false
+    end	
 end
 
 --普通向上移动
@@ -131,7 +176,7 @@ end
 --普通跳跃
 function PlayerView:jump()
 
-       
+   if self.parentScene:wallDetection(TiledMapScene.JUMP,self) == true then 
        local distance = self.jumpValue*2
        local jumpHeight = self:getPositionY() + self.jumpHeight
 
@@ -145,7 +190,7 @@ function PlayerView:jump()
 	            if self.jumpHandler ~= nil then 
 			       g_scheduler:unscheduleScriptEntry(self.jumpHandler)
 			       self.jumpHandler = nil 
-			       self:doEvent("stop")
+			       self:doEvent("isDrop")
 			    end
 	        end
 
@@ -156,7 +201,10 @@ function PlayerView:jump()
 	       self.jumpHandler = nil 
 	    end
 		
-		self.jumpHandler = g_scheduler:scheduleScriptFunc(func,0,false) 
+		self.jumpHandler = g_scheduler:scheduleScriptFunc(func,0,false)
+   else
+        self:doEvent("stop")
+   end
 
 end
 
@@ -199,8 +247,7 @@ function PlayerView:refershPos(direction)
 	  [TiledMapScene.JUMP]  = function()   -- 跳跃
 	  	  --跳跃是一个持续的过程，在这个期间 需要不断的进行碰撞判断
           if self.parentScene:wallDetection(direction,self) == true then
-              if  
-              self:doEvent("isJump")
+             self:doEvent("isJump")
 	      end   
 	  end,
 	  [TiledMapScene.SQUAT]  = function()   -- 下蹲

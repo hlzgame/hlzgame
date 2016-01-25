@@ -84,32 +84,11 @@ function OriginalSceneView:initTileMap()
 end
 
 function OriginalSceneView:pressedLeftBtnListener()
-    local func = function ( )
-    	
-    	--self:refershPlayerPosInfo(self.player,TiledMapScene.LEFT)
-        self.player:refershPos(TiledMapScene.LEFT)
-    end
-
-    if self.leftMoveHandler ~= nil then 
-       g_scheduler:unscheduleScriptEntry(self.leftMoveHandler)
-       self.leftMoveHandler = nil 
-    end
-	
-	self.leftMoveHandler = g_scheduler:scheduleScriptFunc(func,0,false) 
+    self.player:toLeft()
 end
 
 function OriginalSceneView:pressedRightBtnListener()
-	local func = function ( )
-    	--self:refershPlayerPosInfo(self.player,TiledMapScene.RIGHT)
-        self.player:refershPos(TiledMapScene.RIGHT)
-    end
-
-    if self.rightMoveHandler ~= nil then 
-       g_scheduler:unscheduleScriptEntry(self.rightMoveHandler)
-       self.rightMoveHandler = nil 
-    end
-	
-	self.rightMoveHandler = g_scheduler:scheduleScriptFunc(func,0,false) 
+    self.player:toRight() 
 end
 function OriginalSceneView:pressedUpBtnListener()
     --[[按住向上有这几种状态
@@ -120,7 +99,7 @@ function OriginalSceneView:pressedUpBtnListener()
     local isJump = true
     if isJump == true then 
         --self:refershPlayerPosInfo(self.player,TiledMapScene.JUMP)
-        self.player:refershPos(TiledMapScene.JUMP)
+        self.player:doEvent("isJump")
     elseif isJump == false then
         local func = function ( )
             --self:refershPlayerPosInfo(self.player,TiledMapScene.UP)
@@ -155,16 +134,10 @@ end
 
 --松开事件
 function OriginalSceneView:releasedLeftBtnListener()
-	if self.leftMoveHandler ~= nil then 
-       g_scheduler:unscheduleScriptEntry(self.leftMoveHandler)
-       self.leftMoveHandler = nil 
-    end
+	self.player:removeLeftMoveHandler()
 end
 function OriginalSceneView:releasedRightBtnListener()
-    if self.rightMoveHandler ~= nil then 
-       g_scheduler:unscheduleScriptEntry(self.rightMoveHandler)
-       self.rightMoveHandler = nil 
-    end
+    self.player:removeRightMoveHandler()
 end
 function OriginalSceneView:releasedUpBtnListener()
     if self.upMoveHandler ~= nil then 
